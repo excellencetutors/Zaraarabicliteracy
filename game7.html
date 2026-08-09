@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sun & Moon Letters - Arabic Literacy</title>
+    <style>
+        :root {
+            --bg-dark: #0d1b2a;
+            --card-bg: #1b263b;
+            --accent-gold: #ffb703;
+            --accent-green: #06d6a0;
+            --accent-red: #ef476f;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
+        .score-board {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+        }
+
+        .arena {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 500px;
+            border-radius: 24px;
+            padding: 35px 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 3px solid rgba(255,255,255,0.05);
+        }
+
+        .instruction {
+            font-size: 1.1rem;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+        }
+
+        .quran-word-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px 15px;
+            margin-bottom: 30px;
+        }
+
+        .quran-word {
+            font-size: 4rem;
+            font-family: 'Traditional Arabic', 'Amiri', serif;
+            color: var(--white);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .rule-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            padding: 20px 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .rule-card:hover {
+            border-color: var(--accent-gold);
+            background: rgba(255, 183, 3, 0.1);
+        }
+
+        .arabic-type {
+            font-family: 'Traditional Arabic', 'Amiri', serif;
+            font-size: 1.8rem;
+            color: var(--accent-gold);
+        }
+
+        .correct {
+            background: var(--accent-green) !important;
+            color: #000 !important;
+            border-color: var(--accent-green) !important;
+        }
+
+        .correct .arabic-type { color: #000 !important; }
+
+        .wrong {
+            background: var(--accent-red) !important;
+            border-color: var(--accent-red) !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-header">
+        <a href="index.html" class="back-btn">⬅ Menu</a>
+        <div class="score-board">⭐ Score: <span id="score">0</span></div>
+    </div>
+
+    <div class="arena">
+        <div class="instruction">Is this word <strong>Qamariyyah</strong> (clear Laam) or <strong>Shamsiyyah</strong> (silent Laam)?</div>
+
+        <div class="quran-word-box">
+            <div class="quran-word" id="word-display">الْقَمَرُ</div>
+        </div>
+
+        <div class="options-grid">
+            <div class="rule-card" onclick="checkAnswer('Qamariyyah', this)">
+                <span>Moon Letter (Clear Laam)</span>
+                <span class="arabic-type">الْقَمَرِيَّة 🌙</span>
+            </div>
+            <div class="rule-card" onclick="checkAnswer('Shamsiyyah', this)">
+                <span>Sun Letter (Silent Laam)</span>
+                <span class="arabic-type">الشَّمْسِيَّة ☀️</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { word: "الْقَمَرُ", answer: "Qamariyyah" },
+            { word: "الشَّمْسُ", answer: "Shamsiyyah" },
+            { word: "الْكِتَابُ", answer: "Qamariyyah" },
+            { word: "الرَّحْمَنُ", answer: "Shamsiyyah" },
+            { word: "الْبَابُ", answer: "Qamariyyah" },
+            { word: "النَّاسُ", answer: "Shamsiyyah" }
+        ];
+
+        let currentIndex = 0;
+        let score = 0;
+
+        function loadQuestion() {
+            document.getElementById('word-display').innerText = questions[currentIndex].word;
+        }
+
+        function checkAnswer(selected, element) {
+            const current = questions[currentIndex];
+            if (selected === current.answer) {
+                element.classList.add('correct');
+                score += 10;
+                document.getElementById('score').innerText = score;
+                setTimeout(() => {
+                    element.classList.remove('correct');
+                    currentIndex = (currentIndex + 1) % questions.length;
+                    loadQuestion();
+                }, 800);
+            } else {
+                element.classList.add('wrong');
+                setTimeout(() => element.classList.remove('wrong'), 500);
+            }
+        }
+
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>
