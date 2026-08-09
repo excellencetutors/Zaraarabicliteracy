@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Letter Train - Zara’s Arabic Literacy</title>
+    <style>
+        :root {
+            --bg-dark: #0d1b2a;
+            --card-bg: #1b263b;
+            --accent-gold: #ffb703;
+            --accent-green: #06d6a0;
+            --accent-red: #ef476f;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* HEADER & SCORE BAR */
+        .game-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
+        .score-board {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+        }
+
+        /* ARENA */
+        .arena {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 600px;
+            border-radius: 24px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 3px solid rgba(255,255,255,0.05);
+        }
+
+        .instruction {
+            font-size: 1.1rem;
+            color: #cbd5e1;
+            margin-bottom: 15px;
+        }
+
+        /* ISOLATED WORD BANNER */
+        .target-word {
+            font-size: 2.5rem;
+            font-family: 'Traditional Arabic', 'Amiri', serif;
+            color: var(--accent-gold);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 25px;
+            border-radius: 16px;
+            display: inline-block;
+            margin-bottom: 30px;
+            letter-spacing: 5px;
+        }
+
+        /* TRAIN CARS TRACK (Arabic reads Right-to-Left) */
+        .train-track {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+
+        .engine {
+            font-size: 3.5rem;
+        }
+
+        .train-car {
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px dashed var(--accent-gold);
+            border-radius: 16px;
+            width: 80px;
+            height: 90px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            font-family: 'Traditional Arabic', 'Amiri', serif;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .train-car.filled {
+            border-style: solid;
+            background: rgba(6, 214, 160, 0.2);
+            border-color: var(--accent-green);
+        }
+
+        /* TILES SELECTION BOX */
+        .tiles-label {
+            font-size: 0.95rem;
+            color: #a3b18a;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .tiles-grid {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .letter-tile {
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            width: 75px;
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.8rem;
+            font-family: 'Traditional Arabic', 'Amiri', serif;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .letter-tile:hover {
+            border-color: var(--accent-gold);
+            background: rgba(255, 183, 3, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .letter-tile.selected {
+            border-color: var(--accent-green);
+            background: var(--accent-green);
+            color: #000;
+        }
+
+        .wrong-shake {
+            animation: shake 0.4s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-header">
+        <a href="index.html" class="back-btn">⬅ Menu</a>
+        <div class="score-board">⭐ Score: <span id="score">0</span></div>
+    </div>
+
+    <div class="arena">
+        <div class="instruction">Connect the letter shapes to build the word!</div>
+        
+        <!-- Isolated Letters Prompt -->
+        <div class="target-word" id="isolated-prompt">ك - ت - ب</div>
+
+        <!-- Train Cars (RTL arrangement for Arabic) -->
+        <div class="train-track" id="train-cars">
+            <div class="engine">🚂</div>
+            <!-- Dynamic Train Cars -->
+        </div>
+
+        <!-- Options Tiles -->
+        <div class="tiles-label">Tap the correct letter shape below:</div>
+        <div class="tiles-grid" id="tiles-container">
+            <!-- Dynamic Letter Tiles -->
+        </div>
+    </div>
+
+    <script>
+        // Nurul Bayan Stage 1: Connected Letter Forms Data
+        const trainQuestions = [
+            {
+                isolated: "ك - ت - ب",
+                cars: [
+                    { position: "Initial (Beginning)", correct: "كـ" },
+                    { position: "Medial (Middle)", correct: "ـتـ" },
+                    { position: "Final (End)", correct: "ـب" }
+                ],
+                tiles: ["كـ", "ـتـ", "ـب", "تـ"]
+            },
+            {
+                isolated: "ق - ط - ف",
+                cars: [
+                    { position: "Initial", correct: "قـ" },
+                    { position: "Medial", correct: "ـطـ" },
+                    { position: "Final", correct: "ـف" }
+                ],
+                tiles: ["ـطـ", "قـ", "ـف", "فـ"]
+            },
+            {
+                isolated: "ع - ل - م",
+                cars: [
+                    { position: "Initial", correct: "عـ" },
+                    { position: "Medial", correct: "ـلـ" },
+                    { position: "Final", correct: "ـم" }
+                ],
+                tiles: ["ـلـ", "عـ", "مـ", "ـم"]
+            }
+        ];
+
+        let currentQIndex = 0;
+        let currentCarIndex = 0;
+        let score = 0;
+
+        function loadTrainLevel() {
+            const q = trainQuestions[currentQIndex];
+            currentCarIndex = 0;
+
+            document.getElementById('isolated-prompt').innerText = q.isolated;
+
+            // Render Train Cars
+            const carsContainer = document.getElementById('train-cars');
+            carsContainer.innerHTML = '<div class="engine">🚂</div>';
+
+            q.cars.forEach((car, index) => {
+                const carElem = document.createElement('div');
+                carElem.className = 'train-car' + (index === 0 ? ' active-target' : '');
+                carElem.id = `car-${index}`;
+                carElem.innerText = '؟';
+                carsContainer.appendChild(carElem);
+            });
+
+            // Render Option Tiles
+            const tilesContainer = document.getElementById('tiles-container');
+            tilesContainer.innerHTML = '';
+
+            q.tiles.forEach(symbol => {
+                const tile = document.createElement('div');
+                tile.className = 'letter-tile';
+                tile.innerText = symbol;
+                tile.onclick = () => handleTileClick(symbol, tile);
+                tilesContainer.appendChild(tile);
+            });
+        }
+
+        function handleTileClick(selectedSymbol, tileElem) {
+            const q = trainQuestions[currentQIndex];
+            const targetCar = q.cars[currentCarIndex];
+
+            if (selectedSymbol === targetCar.correct) {
+                // Correct match!
+                const carSlot = document.getElementById(`car-${currentCarIndex}`);
+                carSlot.innerText = selectedSymbol;
+                carSlot.classList.add('filled');
+                
+                tileElem.style.visibility = 'hidden'; // Hide used tile
+                currentCarIndex++;
+                score += 10;
+                document.getElementById('score').innerText = score;
+
+                // Check if train is fully built
+                if (currentCarIndex >= q.cars.length) {
+                    setTimeout(() => {
+                        alert("🎉 Awesome job! The train is ready to roll!");
+                        currentQIndex = (currentQIndex + 1) % trainQuestions.length;
+                        loadTrainLevel();
+                    }, 500);
+                }
+            } else {
+                // Wrong tile feedback
+                tileElem.classList.add('wrong-shake');
+                setTimeout(() => tileElem.classList.remove('wrong-shake'), 400);
+            }
+        }
+
+        window.onload = loadTrainLevel;
+    </script>
+</body>
+</html>
