@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harakat Match - Zara’s Arabic Literacy</title>
+    <style>
+        :root {
+            --bg-dark: #0d1b2a;
+            --card-bg: #1b263b;
+            --accent-gold: #ffb703;
+            --accent-green: #06d6a0;
+            --accent-red: #ef476f;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* HEADER & SCORE BAR */
+        .game-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
+        .score-board {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+        }
+
+        /* MAIN GAME ARENA */
+        .arena {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 500px;
+            border-radius: 24px;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 3px solid rgba(255,255,255,0.05);
+        }
+
+        .instruction {
+            font-size: 1.1rem;
+            color: #cbd5e1;
+            margin-bottom: 25px;
+        }
+
+        /* SPEAKER BUTTON */
+        .audio-btn {
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            font-size: 2.5rem;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 183, 3, 0.4);
+            transition: transform 0.2s;
+            margin-bottom: 35px;
+        }
+
+        .audio-btn:active { transform: scale(0.95); }
+
+        /* ARABIC OPTIONS GRID */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .arabic-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            font-size: 3.5rem;
+            padding: 20px 0;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+            font-family: 'Traditional Arabic', 'Amiri', serif;
+        }
+
+        .arabic-card:hover {
+            border-color: var(--accent-gold);
+            background: rgba(255, 183, 3, 0.1);
+        }
+
+        /* FEEDBACK STATES */
+        .correct {
+            background: var(--accent-green) !important;
+            color: #000 !important;
+            border-color: var(--accent-green) !important;
+        }
+
+        .wrong {
+            background: var(--accent-red) !important;
+            border-color: var(--accent-red) !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-header">
+        <a href="index.html" class="back-btn">⬅ Menu</a>
+        <div class="score-board">⭐ Score: <span id="score">0</span></div>
+    </div>
+
+    <div class="arena">
+        <div class="instruction">Tap the speaker to listen, then select the matching letter!</div>
+        
+        <button class="audio-btn" onclick="playQuestionSound()">🔊</button>
+
+        <div class="options-grid" id="options-container">
+            <!-- Dynamic option cards -->
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { sound: "Baa with Fatha (Ba)", correct: "بَ", options: ["بَ", "بِ", "بُ", "تَ"] },
+            { sound: "Baa with Kasra (Bi)", correct: "بِ", options: ["بُ", "بِ", "بَ", "ثِ"] },
+            { sound: "Ta with Damma (Tu)", correct: "تُ", options: ["تَ", "تِ", "تُ", "بُ"] },
+            { sound: "Jim with Fatha (Ja)", correct: "جَ", options: ["حَ", "خَ", "جَ", "جِ"] }
+        ];
+
+        let currentIndex = 0;
+        let score = 0;
+
+        function loadQuestion() {
+            const q = questions[currentIndex];
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            playQuestionSound();
+
+            q.options.forEach(symbol => {
+                const card = document.createElement('div');
+                card.className = 'arabic-card';
+                card.innerText = symbol;
+                card.onclick = () => checkAnswer(symbol, card);
+                container.appendChild(card);
+            });
+        }
+
+        function playQuestionSound() {
+            const q = questions[currentIndex];
+            const utterance = new SpeechSynthesisUtterance(q.sound);
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function checkAnswer(selected, cardElement) {
+            const q = questions[currentIndex];
+
+            if (selected === q.correct) {
+                cardElement.classList.add('correct');
+                score += 10;
+                document.getElementById('score').innerText = score;
+
+                setTimeout(() => {
+                    currentIndex = (currentIndex + 1) % questions.length;
+                    loadQuestion();
+                }, 1000);
+            } else {
+                cardElement.classList.add('wrong');
+                setTimeout(() => {
+                    cardElement.classList.remove('wrong');
+                }, 500);
+            }
+        }
+
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>
