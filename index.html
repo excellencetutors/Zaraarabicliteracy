@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zara’s Arabic Literacy | Learn Arabic Reading, Writing & Tajweed</title>
+    <style>
+        :root {
+            --bg-color: #0d1b2a;
+            --card-bg: #1b263b;
+            --accent-gold: #ffb703;
+            --accent-green: #06d6a0;
+            --accent-pink: #ef476f;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* TOP BAR: BRAND & STARS */
+        .top-nav {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-title {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: var(--accent-gold);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .star-badge {
+            background: var(--accent-gold);
+            color: #000;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* HERO HEADER */
+        .header-section {
+            text-align: center;
+            margin: 40px 20px 20px;
+            max-width: 800px;
+        }
+
+        .header-section h1 {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .header-section p {
+            color: #a3b18a;
+            font-size: 1.2rem;
+            line-height: 1.5;
+        }
+
+        /* GAME GRID */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            width: 90%;
+            max-width: 1100px;
+            margin: 30px auto;
+        }
+
+        .game-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            border: 3px solid transparent;
+            transition: transform 0.3s, border-color 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-gold);
+        }
+
+        .game-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+        }
+
+        .game-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--white);
+        }
+
+        .game-card p {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+
+        .play-btn {
+            background: var(--accent-green);
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            font-weight: 900;
+            font-size: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            width: 100%;
+        }
+
+        .game-card.pink .play-btn { background: var(--accent-pink); color: #fff; }
+        .game-card.gold .play-btn { background: var(--accent-gold); color: #000; }
+    </style>
+</head>
+<body>
+
+    <!-- TOP NAV -->
+    <div class="top-nav">
+        <div class="logo-title">ZARA’S ARABIC LITERACY</div>
+        <div class="star-badge">⭐ <span id="star-count">0</span> Stars</div>
+    </div>
+
+    <!-- MAIN HEADER -->
+    <div class="header-section">
+        <h1>Learn Arabic Reading, Writing & Tajweed 🎒</h1>
+        <p>Interactive Nurul Bayan Standard Games for Teachers & Students</p>
+    </div>
+
+    <!-- GAME SELECTION GRID -->
+    <div class="game-grid">
+
+        <!-- GAME 1 -->
+        <div class="game-card gold" onclick="window.location.href='game1.html'">
+            <div class="game-icon">🍏</div>
+            <h3>Harakat Match</h3>
+            <p>Listen to the audio prompt and tap the correct vowel sound before time runs out!</p>
+            <button class="play-btn">Play Game</button>
+        </div>
+
+        <!-- GAME 2 -->
+        <div class="game-card" onclick="alert('Starting Letter Train!')">
+            <div class="game-icon">🚂</div>
+            <h3>The Letter Train</h3>
+            <p>Assemble connected letter shapes into train cars to master Arabic writing.</p>
+            <button class="play-btn">Play Game</button>
+        </div>
+
+        <!-- GAME 3 -->
+        <div class="game-card pink" onclick="alert('Starting Tanween Pop!')">
+            <div class="game-icon">🎈</div>
+            <h3>Tanween Pop</h3>
+            <p>Pop floating balloons matching the exact Tanween audio prompt!</p>
+            <button class="play-btn">Play Game</button>
+        </div>
+
+        <!-- GAME 4 -->
+        <div class="game-card gold" onclick="alert('Starting Madd Detective!')">
+            <div class="game-icon">🔍</div>
+            <h3>Madd Detective</h3>
+            <p>Use your magnifying glass to spot long vowels hiding in Quranic words.</p>
+            <button class="play-btn">Play Game</button>
+        </div>
+
+    </div>
+
+</body>
+</html>
