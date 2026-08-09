@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arabic Worksheet Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e293b;
+            --accent: #0284c7;
+            --bg-sidebar: #f8fafc;
+            --border-color: #cbd5e1;
+            --font-arabic: 'Amiri', serif;
+            --font-sans: 'Inter', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: #0f172a;
+            color: #334155;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR / CONTROLS (Hidden on print) */
+        .sidebar {
+            width: 360px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar h2 { font-size: 1.25rem; color: var(--primary); }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .control-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        input[type="text"], select, textarea {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 90px;
+            font-family: var(--font-arabic);
+            font-size: 1.1rem;
+            direction: rtl;
+        }
+
+        .btn {
+            background-color: var(--accent);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover { background-color: #0369a1; }
+
+        .btn-print {
+            background-color: #16a34a;
+        }
+        .btn-print:hover { background-color: #15803d; }
+
+        .btn-nav {
+            background: rgba(0, 0, 0, 0.05);
+            color: #334155;
+            text-decoration: none;
+            text-align: center;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* PREVIEW / A4 PAPER CONTAINER */
+        .preview-area {
+            margin-left: 360px;
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            background: #1e293b;
+            min-height: 100vh;
+        }
+
+        .sheet {
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        /* WORKSHEET HEADER */
+        .ws-header {
+            border-bottom: 2px solid #000;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .ws-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .ws-title {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 6px;
+            color: #000;
+        }
+
+        .ws-instructions {
+            text-align: right;
+            font-family: var(--font-arabic);
+            font-size: 1.2rem;
+            color: #333;
+            background: #f1f5f9;
+            padding: 10px;
+            border-radius: 6px;
+            direction: rtl;
+        }
+
+        /* CONTENT GENERATORS */
+        .ws-body {
+            flex: 1;
+            margin-top: 10px;
+        }
+
+        /* GRID TYPE: Trace / Write */
+        .grid-table {
+            width: 100%;
+            border-collapse: collapse;
+            direction: rtl;
+        }
+
+        .grid-table th, .grid-table td {
+            border: 1px solid #94a3b8;
+            padding: 15px;
+            text-align: center;
+            font-family: var(--font-arabic);
+            font-size: 2.2rem;
+        }
+
+        .grid-table th {
+            background-color: #f8fafc;
+            font-size: 1rem;
+            font-family: var(--font-sans);
+        }
+
+        .trace-text {
+            color: #cbd5e1; /* Dotted / Light tracing feel */
+        }
+
+        /* MATCHING / IDENTIFY TYPE */
+        .list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            direction: rtl;
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            border: 1px dashed #64748b;
+            border-radius: 8px;
+            font-family: var(--font-arabic);
+            font-size: 2rem;
+        }
+
+        .answer-box {
+            width: 120px;
+            height: 45px;
+            border: 1.5px solid #000;
+            border-radius: 6px;
+        }
+
+        /* FOOTER */
+        .ws-footer {
+            margin-top: 30px;
+            border-top: 1px solid #cbd5e1;
+            padding-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        /* PRINT MEDIA STYLES */
+        @media print {
+            body { background: white; color: black; }
+            .sidebar, .preview-area {
+                margin: 0;
+                padding: 0;
+                background: white;
+            }
+            .sidebar { display: none !important; }
+            .sheet {
+                box-shadow: none;
+                width: 100%;
+                min-height: 100vh;
+                padding: 0;
+            }
+            @page {
+                size: A4;
+                margin: 15mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR CONTROLS -->
+    <div class="sidebar">
+        <a href="index.html" class="btn-nav">⬅ Return to Menu</a>
+        <h2>Worksheet Generator</h2>
+
+        <div class="control-group">
+            <label>Worksheet Type</label>
+            <select id="ws-type" onchange="renderWorksheet()">
+                <option value="trace">Tracing / Handwriting Practice</option>
+                <option value="identify">Rule Identification (Sukoon/Shaddah)</option>
+                <option value="sunmoon">Sun & Moon Letters Sort</option>
+                <option value="fill">Fill in Missing Letter</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>Title (English)</label>
+            <input type="text" id="ws-title-input" value="Arabic Reading Worksheet" oninput="renderWorksheet()">
+        </div>
+
+        <div class="control-group">
+            <label>Instructions (Arabic)</label>
+            <input type="text" id="ws-inst-input" value="اقْرَأْ وَاكْتُبْ بِخَطٍّ جَمِيلٍ" oninput="renderWorksheet()">
+        </div>
+
+        <div class="control-group">
+            <label>Word Bank / Items (One per line)</label>
+            <textarea id="ws-words-input" oninput="renderWorksheet()">الْقَمَرُ
+الشَّمْسُ
+كَتَبَ
+مَنْ
+رَبَّك
+الْكِتَابُ</textarea>
+        </div>
+
+        <button class="btn btn-print" onclick="window.print()">
+            🖨️ Print Worksheet
+        </button>
+    </div>
+
+    <!-- PRINT PREVIEW SHEET -->
+    <div class="preview-area">
+        <div class="sheet" id="print-sheet">
+            <div>
+                <div class="ws-header">
+                    <div class="ws-meta">
+                        <span>Name: ______________________</span>
+                        <span>Date: ____________</span>
+                        <span>Score: _____/10</span>
+                    </div>
+                    <h1 class="ws-title" id="ws-title-display">Arabic Reading Worksheet</h1>
+                    <div class="ws-instructions" id="ws-inst-display">اقْرَأْ وَاكْتُبْ بِخَطٍّ جَمِيلٍ</div>
+                </div>
+
+                <div class="ws-body" id="ws-body-display">
+                    <!-- Dynamic Worksheet Content Rendered Here -->
+                </div>
+            </div>
+
+            <div class="ws-footer">
+                <span>Classroom Resource - Arabic Literacy</span>
+                <span>Page 1 of 1</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function renderWorksheet() {
+            // Update Title & Instructions
+            const title = document.getElementById('ws-title-input').value;
+            const inst = document.getElementById('ws-inst-input').value;
+            const rawWords = document.getElementById('ws-words-input').value;
+            const words = rawWords.split('\n').filter(w => w.trim() !== '');
+
+            document.getElementById('ws-title-display').innerText = title;
+            document.getElementById('ws-inst-display').innerText = inst;
+
+            const type = document.getElementById('ws-type').value;
+            const body = document.getElementById('ws-body-display');
+            body.innerHTML = '';
+
+            if (type === 'trace') {
+                renderTracingGrid(body, words);
+            } else if (type === 'identify') {
+                renderIdentificationList(body, words);
+            } else if (type === 'sunmoon') {
+                renderSunMoonSort(body, words);
+            } else if (type === 'fill') {
+                renderFillInBlanks(body, words);
+            }
+        }
+
+        function renderTracingGrid(container, words) {
+            let html = `<table class="grid-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%">Model (النموذج)</th>
+                        <th style="width: 37%">Trace (تتبع)</th>
+                        <th style="width: 38%">Write (اكتب)</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+            
+            words.forEach(word => {
+                html += `<tr>
+                    <td><b>${word}</b></td>
+                    <td class="trace-text">${word}</td>
+                    <td></td>
+                </tr>`;
+            });
+
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        }
+
+        function renderIdentificationList(container, words) {
+            let html = `<div class="list-container">`;
+            words.forEach((word, index) => {
+                html += `<div class="list-item">
+                    <span>${index + 1}. ${word}</span>
+                    <div style="display: flex; gap: 15px; font-size: 1rem; font-family: var(--font-sans);">
+                        <label><input type="checkbox"> Sukoon (سكون)</label>
+                        <label><input type="checkbox"> Shaddah (شدة)</label>
+                    </div>
+                </div>`;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function renderSunMoonSort(container, words) {
+            let html = `<div class="list-container" style="margin-bottom: 20px;">`;
+            words.forEach((word, index) => {
+                html += `<div class="list-item">
+                    <span>${index + 1}. ${word}</span>
+                    <div style="display: flex; gap: 15px; font-size: 1rem; font-family: var(--font-sans);">
+                        <label><input type="checkbox"> Qamariyyah (قمرية)</label>
+                        <label><input type="checkbox"> Shamsiyyah (شمسية)</label>
+                    </div>
+                </div>`;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function renderFillInBlanks(container, words) {
+            let html = `<div class="list-container">`;
+            words.forEach((word, index) => {
+                // Obfuscate middle or last char for fill-in practice
+                let blankWord = word.length > 2 ? word.substring(0, word.length - 1) + '___' : word + '___';
+                html += `<div class="list-item">
+                    <span>${index + 1}. ${blankWord}</span>
+                    <div class="answer-box"></div>
+                </div>`;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        // Initial Render
+        window.onload = renderWorksheet;
+    </script>
+</body>
+</html>
