@@ -52,6 +52,28 @@
             color: var(--accent-gold);
         }
 
+        .mute-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .mute-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .mute-btn.muted {
+            background: rgba(239, 71, 111, 0.2);
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
         /* MAIN GAME ARENA */
         .arena {
             background: var(--card-bg);
@@ -128,7 +150,12 @@
 
     <div class="game-header">
         <a href="index.html" class="back-btn">⬅ Menu</a>
-        <div class="score-board">⭐ Score: <span id="score">0</span></div>
+        
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <!-- MUTE BUTTON -->
+            <button class="mute-btn" onclick="toggleMute()">🔊 Sound On</button>
+            <div class="score-board">⭐ Score: <span id="score">0</span></div>
+        </div>
     </div>
 
     <div class="arena">
@@ -141,6 +168,9 @@
         </div>
     </div>
 
+    <!-- 1. LINK SOUND SYNTHESIZER MODULE -->
+    <script src="sound.js"></script>
+
     <script>
         const questions = [
             { sound: "Baa with Fatha (Ba)", correct: "بَ", options: ["بَ", "بِ", "بُ", "تَ"] },
@@ -152,9 +182,6 @@
         let currentIndex = 0;
         let score = 0;
 
-        /* ----------------------------------------------------
-           1. SAVE SCORE FUNCTION (Saves Game 1 high score)
-        ---------------------------------------------------- */
         function saveGameScore(gameNumber, newStars) {
             const key = `arabic_game_${gameNumber}_score`;
             const previousHighScore = parseInt(localStorage.getItem(key) || '0', 10);
@@ -191,13 +218,15 @@
             const q = questions[currentIndex];
 
             if (selected === q.correct) {
+                // 🔊 PLAY CORRECT CHIME
+                if (typeof playCorrectSound === 'function') {
+                    playCorrectSound();
+                }
+
                 cardElement.classList.add('correct');
                 score += 10;
                 document.getElementById('score').innerText = score;
 
-                /* ----------------------------------------------------
-                   2. CALL SAVE SCORE HERE (Updates storage for Game 1)
-                ---------------------------------------------------- */
                 saveGameScore(1, score);
 
                 setTimeout(() => {
@@ -205,6 +234,11 @@
                     loadQuestion();
                 }, 1000);
             } else {
+                // 🔊 PLAY WRONG BUZZ
+                if (typeof playWrongSound === 'function') {
+                    playWrongSound();
+                }
+
                 cardElement.classList.add('wrong');
                 setTimeout(() => {
                     cardElement.classList.remove('wrong');
@@ -212,7 +246,11 @@
             }
         }
 
-        window.onload = loadQuestion;
+        window.onload = () => {
+            score = parseInt(localStorage.getItem('arabic_game_1_score') || '0', 10);
+            document.getElementById('score').innerText = score;
+            loadQuestion();
+        };
     </script>
 </body>
 </html>
