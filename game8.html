@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sun & Moon Letters - Zara’s Arabic Literacy</title>
+    <style>
+        :root {
+            --bg-dark: #0d1b2a;
+            --card-bg: #1b263b;
+            --accent-gold: #ffb703;
+            --accent-green: #06d6a0;
+            --accent-red: #ef476f;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* HEADER & SCORE BAR */
+        .game-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
+        .score-board {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+        }
+
+        /* MAIN GAME ARENA */
+        .arena {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 500px;
+            border-radius: 24px;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 3px solid rgba(255,255,255,0.05);
+        }
+
+        .instruction {
+            font-size: 1.1rem;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+        }
+
+        .question-word {
+            font-size: 3.8rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+            margin-bottom: 30px;
+            font-family: 'Traditional Arabic', 'Amiri', serif;
+        }
+
+        /* ARABIC OPTIONS GRID */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .arabic-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            font-size: 1.4rem;
+            padding: 25px 10px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+
+        .arabic-card:hover {
+            border-color: var(--accent-gold);
+            background: rgba(255, 183, 3, 0.1);
+        }
+
+        /* FEEDBACK STATES */
+        .correct {
+            background: var(--accent-green) !important;
+            color: #000 !important;
+            border-color: var(--accent-green) !important;
+        }
+
+        .wrong {
+            background: var(--accent-red) !important;
+            border-color: var(--accent-red) !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-header">
+        <a href="index.html" class="back-btn">⬅ Menu</a>
+        <div class="score-board">⭐ Score: <span id="score">0</span></div>
+    </div>
+
+    <div class="arena">
+        <div class="instruction">Is this a Sun Letter or a Moon Letter word?</div>
+        <div class="question-word" id="word-display">...</div>
+
+        <div class="options-grid" id="options-container">
+            <!-- Dynamic option cards -->
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { word: "الشَّمْسُ", correct: "☀️ Sun (شمسية)", options: ["☀️ Sun (شمسية)", "🌙 Moon (قمرية)"] },
+            { word: "الْقَمَرُ", correct: "🌙 Moon (قمرية)", options: ["☀️ Sun (شمسية)", "🌙 Moon (قمرية)"] },
+            { word: "النَّجْمُ", correct: "☀️ Sun (شمسية)", options: ["☀️ Sun (شمسية)", "🌙 Moon (قمرية)"] },
+            { word: "الْبَابُ", correct: "🌙 Moon (قمرية)", options: ["☀️ Sun (شمسية)", "🌙 Moon (قمرية)"] },
+            { word: "التِّينُ", correct: "☀️ Sun (شمسية)", options: ["☀️ Sun (شمسية)", "🌙 Moon (قمرية)"] }
+        ];
+
+        let currentIndex = 0;
+        let score = 0;
+
+        /* ----------------------------------------------------
+           SAVE SCORE FUNCTION (Saves Game 8 high score)
+        ---------------------------------------------------- */
+        function saveGameScore(gameNumber, newStars) {
+            const key = `arabic_game_${gameNumber}_score`;
+            const previousHighScore = parseInt(localStorage.getItem(key) || '0', 10);
+
+            if (newStars > previousHighScore) {
+                localStorage.setItem(key, newStars);
+            }
+        }
+
+        function loadQuestion() {
+            const q = questions[currentIndex];
+            document.getElementById('word-display').innerText = q.word;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            q.options.forEach(type => {
+                const card = document.createElement('div');
+                card.className = 'arabic-card';
+                card.innerText = type;
+                card.onclick = () => checkAnswer(type, card);
+                container.appendChild(card);
+            });
+        }
+
+        function checkAnswer(selected, cardElement) {
+            const q = questions[currentIndex];
+
+            if (selected === q.correct) {
+                cardElement.classList.add('correct');
+                score += 10;
+                document.getElementById('score').innerText = score;
+
+                /* ----------------------------------------------------
+                   CALL SAVE SCORE HERE (Pass 8 for Game 8)
+                ---------------------------------------------------- */
+                saveGameScore(8, score);
+
+                setTimeout(() => {
+                    currentIndex = (currentIndex + 1) % questions.length;
+                    loadQuestion();
+                }, 1000);
+            } else {
+                cardElement.classList.add('wrong');
+                setTimeout(() => {
+                    cardElement.classList.remove('wrong');
+                }, 500);
+            }
+        }
+
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>
