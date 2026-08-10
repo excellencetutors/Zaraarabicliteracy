@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shaddah Practice - Arabic Literacy</title>
+    <title>Shaddah Rules - Zara’s Arabic Literacy</title>
     <style>
         :root {
             --bg-dark: #0d1b2a;
@@ -27,13 +27,14 @@
             padding: 20px;
         }
 
+        /* HEADER & SCORE BAR */
         .game-header {
             width: 100%;
             max-width: 600px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .back-btn {
@@ -51,12 +52,13 @@
             color: var(--accent-gold);
         }
 
+        /* MAIN GAME ARENA */
         .arena {
             background: var(--card-bg);
             width: 100%;
             max-width: 500px;
             border-radius: 24px;
-            padding: 35px 20px;
+            padding: 40px 20px;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             border: 3px solid rgba(255,255,255,0.05);
@@ -68,58 +70,44 @@
             margin-bottom: 20px;
         }
 
-        .quran-word-box {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 25px 15px;
-            margin-bottom: 30px;
-        }
-
-        .quran-word {
+        .question-word {
             font-size: 4rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+            margin-bottom: 30px;
             font-family: 'Traditional Arabic', 'Amiri', serif;
-            color: var(--white);
         }
 
+        /* ARABIC OPTIONS GRID */
         .options-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 20px;
         }
 
-        .rule-card {
+        .arabic-card {
             background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(255, 255, 255, 0.12);
-            border-radius: 16px;
-            padding: 20px 10px;
-            font-size: 1.2rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            font-size: 3.5rem;
+            padding: 20px 0;
             cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            align-items: center;
+            user-select: none;
             transition: all 0.2s;
+            font-family: 'Traditional Arabic', 'Amiri', serif;
         }
 
-        .rule-card:hover {
+        .arabic-card:hover {
             border-color: var(--accent-gold);
             background: rgba(255, 183, 3, 0.1);
         }
 
-        .arabic-type {
-            font-family: 'Traditional Arabic', 'Amiri', serif;
-            font-size: 2.2rem;
-            color: var(--accent-gold);
-        }
-
+        /* FEEDBACK STATES */
         .correct {
             background: var(--accent-green) !important;
             color: #000 !important;
             border-color: var(--accent-green) !important;
         }
-
-        .correct .arabic-type { color: #000 !important; }
 
         .wrong {
             background: var(--accent-red) !important;
@@ -135,55 +123,75 @@
     </div>
 
     <div class="arena">
-        <div class="instruction">Does this word contain a <strong>Shaddah</strong> (doubled letter)?</div>
+        <div class="instruction">Identify the letter carrying a Shaddah (ّ):</div>
+        <div class="question-word" id="word-display">...</div>
 
-        <div class="quran-word-box">
-            <div class="quran-word" id="word-display">رَبَّك</div>
-        </div>
-
-        <div class="options-grid">
-            <div class="rule-card" onclick="checkAnswer(true, this)">
-                <span>Has Shaddah</span>
-                <span class="arabic-type">شَدَّة ( ّ )</span>
-            </div>
-            <div class="rule-card" onclick="checkAnswer(false, this)">
-                <span>No Shaddah</span>
-                <span class="arabic-type">مُخَفَّف</span>
-            </div>
+        <div class="options-grid" id="options-container">
+            <!-- Dynamic option cards -->
         </div>
     </div>
 
     <script>
         const questions = [
-            { word: "رَبَّك", hasShaddah: true },
-            { word: "قَلَم", hasShaddah: false },
-            { word: "إِنَّ", hasShaddah: true },
-            { word: "بَيْت", hasShaddah: false },
-            { word: "ثُمَّ", hasShaddah: true },
-            { word: "صَبَرَ", hasShaddah: false }
+            { word: "رَبَّ", correct: "بَّ", options: ["بَّ", "رَ", "تَّ", "بَ"] },
+            { word: "ثُمَّ", correct: "مَّ", options: ["ثُ", "مَّ", "مُ", "نَّ"] },
+            { word: "عَلَّمَ", correct: "لَّ", options: ["عَ", "لَّ", "مَ", "لَ"] },
+            { word: "إِنَّ", correct: "نَّ", options: ["إِ", "نَّ", "نَ", "مَّ"] }
         ];
 
         let currentIndex = 0;
         let score = 0;
 
-        function loadQuestion() {
-            document.getElementById('word-display').innerText = questions[currentIndex].word;
+        /* ----------------------------------------------------
+           SAVE SCORE FUNCTION (Saves Game 6 high score)
+        ---------------------------------------------------- */
+        function saveGameScore(gameNumber, newStars) {
+            const key = `arabic_game_${gameNumber}_score`;
+            const previousHighScore = parseInt(localStorage.getItem(key) || '0', 10);
+
+            if (newStars > previousHighScore) {
+                localStorage.setItem(key, newStars);
+            }
         }
 
-        function checkAnswer(selected, element) {
-            const current = questions[currentIndex];
-            if (selected === current.hasShaddah) {
-                element.classList.add('correct');
+        function loadQuestion() {
+            const q = questions[currentIndex];
+            document.getElementById('word-display').innerText = q.word;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            q.options.forEach(symbol => {
+                const card = document.createElement('div');
+                card.className = 'arabic-card';
+                card.innerText = symbol;
+                card.onclick = () => checkAnswer(symbol, card);
+                container.appendChild(card);
+            });
+        }
+
+        function checkAnswer(selected, cardElement) {
+            const q = questions[currentIndex];
+
+            if (selected === q.correct) {
+                cardElement.classList.add('correct');
                 score += 10;
                 document.getElementById('score').innerText = score;
+
+                /* ----------------------------------------------------
+                   CALL SAVE SCORE HERE (Pass 6 for Game 6)
+                ---------------------------------------------------- */
+                saveGameScore(6, score);
+
                 setTimeout(() => {
-                    element.classList.remove('correct');
                     currentIndex = (currentIndex + 1) % questions.length;
                     loadQuestion();
-                }, 800);
+                }, 1000);
             } else {
-                element.classList.add('wrong');
-                setTimeout(() => element.classList.remove('wrong'), 500);
+                cardElement.classList.add('wrong');
+                setTimeout(() => {
+                    cardElement.classList.remove('wrong');
+                }, 500);
             }
         }
 
