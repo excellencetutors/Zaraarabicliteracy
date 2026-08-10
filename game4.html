@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Madd & Tajweed Rules - Zara’s Arabic Literacy</title>
+    <title>Madd Rules - Zara’s Arabic Literacy</title>
     <style>
         :root {
             --bg-dark: #0d1b2a;
@@ -34,7 +34,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .back-btn {
@@ -52,13 +52,13 @@
             color: var(--accent-gold);
         }
 
-        /* ARENA */
+        /* MAIN GAME ARENA */
         .arena {
             background: var(--card-bg);
             width: 100%;
             max-width: 500px;
             border-radius: 24px;
-            padding: 35px 20px;
+            padding: 40px 20px;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             border: 3px solid rgba(255,255,255,0.05);
@@ -67,78 +67,48 @@
         .instruction {
             font-size: 1.1rem;
             color: #cbd5e1;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
-        /* AUDIO RECITATION BUTTON */
+        /* SPEAKER BUTTON */
         .audio-btn {
             background: var(--accent-gold);
             color: #000;
             border: none;
-            padding: 10px 22px;
-            border-radius: 25px;
-            font-size: 1.1rem;
-            font-weight: bold;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            font-size: 2.5rem;
             cursor: pointer;
-            box-shadow: 0 0 15px rgba(255, 183, 3, 0.3);
-            margin-bottom: 25px;
+            box-shadow: 0 0 20px rgba(255, 183, 3, 0.4);
+            transition: transform 0.2s;
+            margin-bottom: 35px;
         }
 
         .audio-btn:active { transform: scale(0.95); }
 
-        /* QURANIC WORD DISPLAY */
-        .quran-word-box {
+        /* ARABIC OPTIONS GRID */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .arabic-card {
             background: rgba(255, 255, 255, 0.05);
             border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 25px 15px;
-            margin-bottom: 30px;
-        }
-
-        .quran-word {
-            font-size: 4rem;
-            font-family: 'Traditional Arabic', 'Amiri', serif;
-            color: var(--white);
-            letter-spacing: 2px;
-        }
-
-        /* RULE OPTIONS GRID */
-        .options-label {
-            font-size: 1rem;
-            color: #a3b18a;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .options-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .rule-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(255, 255, 255, 0.12);
-            border-radius: 16px;
-            padding: 16px 20px;
-            font-size: 1.3rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            border-radius: 18px;
+            font-size: 3.5rem;
+            padding: 20px 0;
             cursor: pointer;
+            user-select: none;
             transition: all 0.2s;
+            font-family: 'Traditional Arabic', 'Amiri', serif;
         }
 
-        .rule-card:hover {
+        .arabic-card:hover {
             border-color: var(--accent-gold);
             background: rgba(255, 183, 3, 0.1);
-        }
-
-        .arabic-type {
-            font-family: 'Traditional Arabic', 'Amiri', serif;
-            font-size: 1.8rem;
-            color: var(--accent-gold);
         }
 
         /* FEEDBACK STATES */
@@ -146,10 +116,6 @@
             background: var(--accent-green) !important;
             color: #000 !important;
             border-color: var(--accent-green) !important;
-        }
-
-        .correct .arabic-type {
-            color: #000 !important;
         }
 
         .wrong {
@@ -166,107 +132,76 @@
     </div>
 
     <div class="arena">
-        <div class="instruction">Listen to the word and identify the Madd rule!</div>
+        <div class="instruction">Tap the speaker to listen, then select the matching long vowel (Madd)!</div>
         
-        <button class="audio-btn" onclick="playWordRecitation()">🔊 Listen Recitation</button>
+        <button class="audio-btn" onclick="playQuestionSound()">🔊</button>
 
-        <div class="quran-word-box">
-            <div class="quran-word" id="word-display">قَالَ</div>
-        </div>
-
-        <div class="options-label">Which long vowel (Madd) is in this word?</div>
-        
         <div class="options-grid" id="options-container">
-            <!-- Dynamic option buttons -->
+            <!-- Dynamic option cards -->
         </div>
     </div>
 
     <script>
-        // Madd Stage Questions (Nurul Bayan Standard)
-        const maddQuestions = [
-            {
-                word: "قَالَ",
-                soundText: "Qaa la",
-                correct: "Madd Alif",
-                options: [
-                    { name: "Madd Alif", symbol: "مَدّ الأَلِف (َا)" },
-                    { name: "Madd Ya", symbol: "مَدّ اليَاء (ِي)" },
-                    { name: "Madd Waw", symbol: "مَدّ الوَاو (ُو)" }
-                ]
-            },
-            {
-                word: "قِيلَ",
-                soundText: "Qee la",
-                correct: "Madd Ya",
-                options: [
-                    { name: "Madd Alif", symbol: "مَدّ الأَلِف (َا)" },
-                    { name: "Madd Ya", symbol: "مَدّ اليَاء (ِي)" },
-                    { name: "Madd Waw", symbol: "مَدّ الوَاو (ُو)" }
-                ]
-            },
-            {
-                word: "يَقُولُ",
-                soundText: "Ya qoo lu",
-                correct: "Madd Waw",
-                options: [
-                    { name: "Madd Alif", symbol: "مَدّ الأَلِف (َا)" },
-                    { name: "Madd Ya", symbol: "مَدّ اليَاء (ِي)" },
-                    { name: "Madd Waw", symbol: "مَدّ الوَاو (ُو)" }
-                ]
-            },
-            {
-                word: "كِتَابٌ",
-                soundText: "Ki taa bun",
-                correct: "Madd Alif",
-                options: [
-                    { name: "Madd Alif", symbol: "مَدّ الأَلِف (َا)" },
-                    { name: "Madd Ya", symbol: "مَدّ اليَاء (ِي)" },
-                    { name: "Madd Waw", symbol: "مَدّ الوَاو (ُو)" }
-                ]
-            }
+        const questions = [
+            { sound: "Baa with Madd Alif (Baa)", correct: "با", options: ["با", "بو", "بي", "بَ"] },
+            { sound: "Baa with Madd Waw (Boo)", correct: "بو", options: ["با", "بو", "بي", "بُ"] },
+            { sound: "Ta with Madd Ya (Tee)", correct: "تي", options: ["تا", "تو", "تي", "تِ"] },
+            { sound: "Jim with Madd Alif (Jaa)", correct: "جا", options: ["جا", "جو", "جي", "جَ"] }
         ];
 
         let currentIndex = 0;
         let score = 0;
 
+        /* ----------------------------------------------------
+           SAVE SCORE FUNCTION (Saves Game 4 high score)
+        ---------------------------------------------------- */
+        function saveGameScore(gameNumber, newStars) {
+            const key = `arabic_game_${gameNumber}_score`;
+            const previousHighScore = parseInt(localStorage.getItem(key) || '0', 10);
+
+            if (newStars > previousHighScore) {
+                localStorage.setItem(key, newStars);
+            }
+        }
+
         function loadQuestion() {
-            const q = maddQuestions[currentIndex];
-            document.getElementById('word-display').innerText = q.word;
-
-            playWordRecitation();
-
+            const q = questions[currentIndex];
             const container = document.getElementById('options-container');
             container.innerHTML = '';
 
-            q.options.forEach(opt => {
+            playQuestionSound();
+
+            q.options.forEach(symbol => {
                 const card = document.createElement('div');
-                card.className = 'rule-card';
-                card.innerHTML = `
-                    <span>${opt.name}</span>
-                    <span class="arabic-type">${opt.symbol}</span>
-                `;
-                card.onclick = () => checkAnswer(opt.name, card);
+                card.className = 'arabic-card';
+                card.innerText = symbol;
+                card.onclick = () => checkAnswer(symbol, card);
                 container.appendChild(card);
             });
         }
 
-        function playWordRecitation() {
-            const q = maddQuestions[currentIndex];
-            const utterance = new SpeechSynthesisUtterance(q.soundText);
-            utterance.rate = 0.8; // Slower rate for Tajweed clarity
+        function playQuestionSound() {
+            const q = questions[currentIndex];
+            const utterance = new SpeechSynthesisUtterance(q.sound);
+            utterance.rate = 0.9;
             window.speechSynthesis.speak(utterance);
         }
 
-        function checkAnswer(selectedRule, cardElement) {
-            const q = maddQuestions[currentIndex];
+        function checkAnswer(selected, cardElement) {
+            const q = questions[currentIndex];
 
-            if (selectedRule === q.correct) {
+            if (selected === q.correct) {
                 cardElement.classList.add('correct');
                 score += 10;
                 document.getElementById('score').innerText = score;
 
+                /* ----------------------------------------------------
+                   CALL SAVE SCORE HERE (Pass 4 for Game 4)
+                ---------------------------------------------------- */
+                saveGameScore(4, score);
+
                 setTimeout(() => {
-                    currentIndex = (currentIndex + 1) % maddQuestions.length;
+                    currentIndex = (currentIndex + 1) % questions.length;
                     loadQuestion();
                 }, 1000);
             } else {
