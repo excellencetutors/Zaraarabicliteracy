@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Letter Train - Zara’s Arabic Literacy</title>
+    <title>Letter Joining - Zara’s Arabic Literacy</title>
     <style>
         :root {
             --bg-dark: #0d1b2a;
@@ -34,7 +34,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .back-btn {
@@ -52,13 +52,13 @@
             color: var(--accent-gold);
         }
 
-        /* ARENA */
+        /* MAIN GAME ARENA */
         .arena {
             background: var(--card-bg);
             width: 100%;
-            max-width: 600px;
+            max-width: 500px;
             border-radius: 24px;
-            padding: 30px 20px;
+            padding: 40px 20px;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             border: 3px solid rgba(255,255,255,0.05);
@@ -67,111 +67,50 @@
         .instruction {
             font-size: 1.1rem;
             color: #cbd5e1;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
-        /* ISOLATED WORD BANNER */
-        .target-word {
-            font-size: 2.5rem;
-            font-family: 'Traditional Arabic', 'Amiri', serif;
+        .question-box {
+            font-size: 2.2rem;
+            font-weight: bold;
             color: var(--accent-gold);
-            background: rgba(255, 255, 255, 0.05);
-            padding: 10px 25px;
-            border-radius: 16px;
-            display: inline-block;
             margin-bottom: 30px;
-            letter-spacing: 5px;
         }
 
-        /* TRAIN CARS TRACK (Arabic reads Right-to-Left) */
-        .train-track {
-            display: flex;
-            flex-direction: row-reverse;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 40px;
-            overflow-x: auto;
-            padding: 10px 0;
+        /* ARABIC OPTIONS GRID */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
 
-        .engine {
+        .arabic-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
             font-size: 3.5rem;
-        }
-
-        .train-car {
-            background: rgba(255, 255, 255, 0.08);
-            border: 2px dashed var(--accent-gold);
-            border-radius: 16px;
-            width: 80px;
-            height: 90px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 3rem;
-            font-family: 'Traditional Arabic', 'Amiri', serif;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .train-car.filled {
-            border-style: solid;
-            background: rgba(6, 214, 160, 0.2);
-            border-color: var(--accent-green);
-        }
-
-        /* TILES SELECTION BOX */
-        .tiles-label {
-            font-size: 0.95rem;
-            color: #a3b18a;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .tiles-grid {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .letter-tile {
-            background: rgba(255, 255, 255, 0.08);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            border-radius: 16px;
-            width: 75px;
-            height: 80px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2.8rem;
-            font-family: 'Traditional Arabic', 'Amiri', serif;
+            padding: 20px 0;
             cursor: pointer;
             user-select: none;
             transition: all 0.2s;
+            font-family: 'Traditional Arabic', 'Amiri', serif;
         }
 
-        .letter-tile:hover {
+        .arabic-card:hover {
             border-color: var(--accent-gold);
-            background: rgba(255, 183, 3, 0.15);
-            transform: translateY(-4px);
+            background: rgba(255, 183, 3, 0.1);
         }
 
-        .letter-tile.selected {
-            border-color: var(--accent-green);
-            background: var(--accent-green);
-            color: #000;
+        /* FEEDBACK STATES */
+        .correct {
+            background: var(--accent-green) !important;
+            color: #000 !important;
+            border-color: var(--accent-green) !important;
         }
 
-        .wrong-shake {
-            animation: shake 0.4s;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-8px); }
-            40%, 80% { transform: translateX(8px); }
+        .wrong {
+            background: var(--accent-red) !important;
+            border-color: var(--accent-red) !important;
         }
     </style>
 </head>
@@ -183,122 +122,79 @@
     </div>
 
     <div class="arena">
-        <div class="instruction">Connect the letter shapes to build the word!</div>
-        
-        <!-- Isolated Letters Prompt -->
-        <div class="target-word" id="isolated-prompt">ك - ت - ب</div>
+        <div class="instruction">Select the correct joined letter form:</div>
+        <div class="question-box" id="question-text">Loading...</div>
 
-        <!-- Train Cars (RTL arrangement for Arabic) -->
-        <div class="train-track" id="train-cars">
-            <div class="engine">🚂</div>
-            <!-- Dynamic Train Cars -->
-        </div>
-
-        <!-- Options Tiles -->
-        <div class="tiles-label">Tap the correct letter shape below:</div>
-        <div class="tiles-grid" id="tiles-container">
-            <!-- Dynamic Letter Tiles -->
+        <div class="options-grid" id="options-container">
+            <!-- Dynamic option cards -->
         </div>
     </div>
 
     <script>
-        // Nurul Bayan Stage 1: Connected Letter Forms Data
-        const trainQuestions = [
-            {
-                isolated: "ك - ت - ب",
-                cars: [
-                    { position: "Initial (Beginning)", correct: "كـ" },
-                    { position: "Medial (Middle)", correct: "ـتـ" },
-                    { position: "Final (End)", correct: "ـب" }
-                ],
-                tiles: ["كـ", "ـتـ", "ـب", "تـ"]
-            },
-            {
-                isolated: "ق - ط - ف",
-                cars: [
-                    { position: "Initial", correct: "قـ" },
-                    { position: "Medial", correct: "ـطـ" },
-                    { position: "Final", correct: "ـف" }
-                ],
-                tiles: ["ـطـ", "قـ", "ـف", "فـ"]
-            },
-            {
-                isolated: "ع - ل - م",
-                cars: [
-                    { position: "Initial", correct: "عـ" },
-                    { position: "Medial", correct: "ـلـ" },
-                    { position: "Final", correct: "ـم" }
-                ],
-                tiles: ["ـلـ", "عـ", "مـ", "ـم"]
-            }
+        const questions = [
+            { prompt: "INITIAL form of Baa (ب)", correct: "بـ", options: ["بـ", "ـبـ", "ـب", "ب"] },
+            { prompt: "MEDIAL form of Seen (س)", correct: "ـسـ", options: ["سـ", "ـسـ", "ـس", "س"] },
+            { prompt: "FINAL form of Meem (م)", correct: "ـم", options: ["مـ", "ـمـ", "ـم", "م"] },
+            { prompt: "INITIAL form of Jeem (ج)", correct: "جـ", options: ["حـ", "جـ", "ـجـ", "ـج"] }
         ];
 
-        let currentQIndex = 0;
-        let currentCarIndex = 0;
+        let currentIndex = 0;
         let score = 0;
 
-        function loadTrainLevel() {
-            const q = trainQuestions[currentQIndex];
-            currentCarIndex = 0;
+        /* ----------------------------------------------------
+           SAVE SCORE FUNCTION (Saves Game 2 high score)
+        ---------------------------------------------------- */
+        function saveGameScore(gameNumber, newStars) {
+            const key = `arabic_game_${gameNumber}_score`;
+            const previousHighScore = parseInt(localStorage.getItem(key) || '0', 10);
 
-            document.getElementById('isolated-prompt').innerText = q.isolated;
+            if (newStars > previousHighScore) {
+                localStorage.setItem(key, newStars);
+            }
+        }
 
-            // Render Train Cars
-            const carsContainer = document.getElementById('train-cars');
-            carsContainer.innerHTML = '<div class="engine">🚂</div>';
+        function loadQuestion() {
+            const q = questions[currentIndex];
+            document.getElementById('question-text').innerText = q.prompt;
 
-            q.cars.forEach((car, index) => {
-                const carElem = document.createElement('div');
-                carElem.className = 'train-car' + (index === 0 ? ' active-target' : '');
-                carElem.id = `car-${index}`;
-                carElem.innerText = '؟';
-                carsContainer.appendChild(carElem);
-            });
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
 
-            // Render Option Tiles
-            const tilesContainer = document.getElementById('tiles-container');
-            tilesContainer.innerHTML = '';
-
-            q.tiles.forEach(symbol => {
-                const tile = document.createElement('div');
-                tile.className = 'letter-tile';
-                tile.innerText = symbol;
-                tile.onclick = () => handleTileClick(symbol, tile);
-                tilesContainer.appendChild(tile);
+            q.options.forEach(symbol => {
+                const card = document.createElement('div');
+                card.className = 'arabic-card';
+                card.innerText = symbol;
+                card.onclick = () => checkAnswer(symbol, card);
+                container.appendChild(card);
             });
         }
 
-        function handleTileClick(selectedSymbol, tileElem) {
-            const q = trainQuestions[currentQIndex];
-            const targetCar = q.cars[currentCarIndex];
+        function checkAnswer(selected, cardElement) {
+            const q = questions[currentIndex];
 
-            if (selectedSymbol === targetCar.correct) {
-                // Correct match!
-                const carSlot = document.getElementById(`car-${currentCarIndex}`);
-                carSlot.innerText = selectedSymbol;
-                carSlot.classList.add('filled');
-                
-                tileElem.style.visibility = 'hidden'; // Hide used tile
-                currentCarIndex++;
+            if (selected === q.correct) {
+                cardElement.classList.add('correct');
                 score += 10;
                 document.getElementById('score').innerText = score;
 
-                // Check if train is fully built
-                if (currentCarIndex >= q.cars.length) {
-                    setTimeout(() => {
-                        alert("🎉 Awesome job! The train is ready to roll!");
-                        currentQIndex = (currentQIndex + 1) % trainQuestions.length;
-                        loadTrainLevel();
-                    }, 500);
-                }
+                /* ----------------------------------------------------
+                   CALL SAVE SCORE HERE (Pass 2 for Game 2)
+                ---------------------------------------------------- */
+                saveGameScore(2, score);
+
+                setTimeout(() => {
+                    currentIndex = (currentIndex + 1) % questions.length;
+                    loadQuestion();
+                }, 1000);
             } else {
-                // Wrong tile feedback
-                tileElem.classList.add('wrong-shake');
-                setTimeout(() => tileElem.classList.remove('wrong-shake'), 400);
+                cardElement.classList.add('wrong');
+                setTimeout(() => {
+                    cardElement.classList.remove('wrong');
+                }, 500);
             }
         }
 
-        window.onload = loadTrainLevel;
+        window.onload = loadQuestion;
     </script>
 </body>
 </html>
