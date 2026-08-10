@@ -10,7 +10,7 @@
             --card-bg: #1b263b;
             --accent-gold: #ffb703;
             --accent-green: #06d6a0;
-            --accent-pink: #ef476f;
+            --accent-red: #ef476f;
             --white: #ffffff;
         }
 
@@ -45,20 +45,46 @@
             font-size: 1rem;
         }
 
-        /* TOTAL SCORE BADGE */
+        /* SCORE & RESET BAR */
+        .score-bar-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 35px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
         .total-score-card {
             background: rgba(255, 183, 3, 0.15);
             border: 2px solid var(--accent-gold);
             border-radius: 20px;
-            padding: 15px 30px;
+            padding: 12px 25px;
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: bold;
             color: var(--accent-gold);
-            margin-bottom: 35px;
-            box-shadow: 0 0 20px rgba(255, 183, 3, 0.2);
+            box-shadow: 0 0 20px rgba(255, 183, 3, 0.15);
+        }
+
+        .reset-btn {
+            background: rgba(239, 71, 111, 0.15);
+            border: 2px solid var(--accent-red);
+            color: var(--accent-red);
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .reset-btn:hover {
+            background: var(--accent-red);
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(239, 71, 111, 0.4);
         }
 
         /* GAMES GRID */
@@ -116,7 +142,7 @@
             justify-content: space-between;
             align-items: center;
             padding-top: 15px;
-            border-top: 1fr solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             font-weight: bold;
             font-size: 0.95rem;
             color: var(--accent-gold);
@@ -138,10 +164,13 @@
         <p class="subtitle">Interactive Tajweed &amp; Phonics Learning Hub</p>
     </header>
 
-    <!-- AGGREGATED TOTAL SCORE -->
-    <div class="total-score-card">
-        <span>⭐ Total Stars Earned:</span>
-        <span id="total-stars">0</span>
+    <!-- AGGREGATED TOTAL SCORE & RESET ACTION -->
+    <div class="score-bar-container">
+        <div class="total-score-card">
+            <span>⭐ Total Stars Earned:</span>
+            <span id="total-stars">0</span>
+        </div>
+        <button class="reset-btn" onclick="confirmResetProgress()">🔄 Reset Progress</button>
     </div>
 
     <!-- 8 GAME CARDS GRID -->
@@ -254,17 +283,17 @@
     </div>
 
     <script>
+        const totalGames = 8;
+
         /* ----------------------------------------------------
-           CALCULATE & DISPLAY SCORES FROM ALL 8 GAMES
+           LOAD SCORES & AGGREGATE TOTAL
         ---------------------------------------------------- */
         function loadTotalScores() {
             let grandTotal = 0;
-            const totalGames = 8;
 
             for (let i = 1; i <= totalGames; i++) {
                 const gameScore = parseInt(localStorage.getItem(`arabic_game_${i}_score`) || '0', 10);
                 
-                // Update individual game card score badge
                 const scoreElement = document.getElementById(`score-g${i}`);
                 if (scoreElement) {
                     scoreElement.innerText = gameScore;
@@ -273,8 +302,20 @@
                 grandTotal += gameScore;
             }
 
-            // Update main overall star display
             document.getElementById('total-stars').innerText = grandTotal;
+        }
+
+        /* ----------------------------------------------------
+           RESET ALL HIGH SCORES
+        ---------------------------------------------------- */
+        function confirmResetProgress() {
+            const userConfirmed = confirm("Are you sure you want to reset all high scores to zero?");
+            if (userConfirmed) {
+                for (let i = 1; i <= totalGames; i++) {
+                    localStorage.removeItem(`arabic_game_${i}_score`);
+                }
+                loadTotalScores();
+            }
         }
 
         window.onload = loadTotalScores;
