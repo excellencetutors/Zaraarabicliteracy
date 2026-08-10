@@ -3,417 +3,316 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arabic Worksheet Generator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Printable Worksheet Generator - Zara’s Arabic Literacy</title>
     <style>
         :root {
-            --primary: #1e293b;
-            --accent: #0284c7;
-            --bg-sidebar: #f8fafc;
-            --border-color: #cbd5e1;
-            --font-arabic: 'Amiri', serif;
-            --font-sans: 'Inter', sans-serif;
+            --bg-dark: #0d1b2a;
+            --card-bg: #1b263b;
+            --accent-gold: #ffb703;
+            --accent-green: #06d6a0;
+            --white: #ffffff;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: var(--font-sans);
-            background-color: #0f172a;
-            color: #334155;
-            display: flex;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--white);
             min-height: 100vh;
-        }
-
-        /* SIDEBAR / CONTROLS (Hidden on print) */
-        .sidebar {
-            width: 360px;
-            background: var(--bg-sidebar);
-            border-right: 1px solid var(--border-color);
-            padding: 24px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            overflow-y: auto;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
+            align-items: center;
+            padding: 20px;
         }
 
-        .sidebar h2 { font-size: 1.25rem; color: var(--primary); }
+        /* HEADER & CONTROLS */
+        .page-header {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .back-btn, .print-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+
+        .print-btn {
+            background: var(--accent-gold);
+            color: #000;
+        }
+
+        .print-btn:hover {
+            background: #e0a200;
+        }
+
+        /* GENERATOR CONTROL PANEL */
+        .control-panel {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 800px;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            border: 2px solid rgba(255,255,255,0.05);
+        }
 
         .control-group {
             display: flex;
             flex-direction: column;
-            gap: 6px;
-        }
-
-        .control-group label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #475569;
-        }
-
-        input[type="text"], select, textarea {
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-family: var(--font-sans);
-            font-size: 0.9rem;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 90px;
-            font-family: var(--font-arabic);
-            font-size: 1.1rem;
-            direction: rtl;
-        }
-
-        .btn {
-            background-color: var(--accent);
-            color: white;
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             gap: 8px;
         }
 
-        .btn:hover { background-color: #0369a1; }
-
-        .btn-print {
-            background-color: #16a34a;
-        }
-        .btn-print:hover { background-color: #15803d; }
-
-        .btn-nav {
-            background: rgba(0, 0, 0, 0.05);
-            color: #334155;
-            text-decoration: none;
-            text-align: center;
-            padding: 8px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
+        .control-group label {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            font-weight: bold;
         }
 
-        /* PREVIEW / A4 PAPER CONTAINER */
-        .preview-area {
-            margin-left: 360px;
-            flex: 1;
-            padding: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            background: #1e293b;
-            min-height: 100vh;
+        .control-group select, .control-group input {
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.3);
+            color: var(--white);
+            font-size: 1rem;
         }
 
-        .sheet {
-            background: white;
-            width: 210mm;
-            min-height: 297mm;
-            padding: 20mm;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        /* PRINTABLE WORKSHEET CANVAS (SCREEN PREVIEW) */
+        .worksheet-paper {
+            background: #ffffff;
+            color: #000000;
+            width: 100%;
+            max-width: 800px;
+            min-height: 1000px;
+            padding: 50px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            font-family: 'Segoe UI', Arial, sans-serif;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            position: relative;
         }
 
-        /* WORKSHEET HEADER */
         .ws-header {
-            border-bottom: 2px solid #000;
-            padding-bottom: 12px;
-            margin-bottom: 20px;
-        }
-
-        .ws-meta {
             display: flex;
             justify-content: space-between;
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 15px;
+            align-items: flex-end;
+            border-bottom: 2px solid #000;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
         }
 
-        .ws-title {
-            text-align: center;
+        .ws-title-block h2 {
             font-size: 1.8rem;
-            margin-bottom: 6px;
             color: #000;
+            margin-bottom: 5px;
         }
 
-        .ws-instructions {
+        .ws-title-block p {
+            font-size: 0.95rem;
+            color: #555;
+        }
+
+        .ws-meta-fields {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 0.95rem;
             text-align: right;
-            font-family: var(--font-arabic);
-            font-size: 1.2rem;
-            color: #333;
-            background: #f1f5f9;
-            padding: 10px;
-            border-radius: 6px;
-            direction: rtl;
         }
 
-        /* CONTENT GENERATORS */
-        .ws-body {
-            flex: 1;
+        .ws-meta-line {
+            border-bottom: 1px solid #000;
+            width: 180px;
+            display: inline-block;
+        }
+
+        /* WORKSHEET GRID ITEMS */
+        .ws-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
             margin-top: 10px;
         }
 
-        /* GRID TYPE: Trace / Write */
-        .grid-table {
-            width: 100%;
-            border-collapse: collapse;
-            direction: rtl;
-        }
-
-        .grid-table th, .grid-table td {
-            border: 1px solid #94a3b8;
-            padding: 15px;
-            text-align: center;
-            font-family: var(--font-arabic);
-            font-size: 2.2rem;
-        }
-
-        .grid-table th {
-            background-color: #f8fafc;
-            font-size: 1rem;
-            font-family: var(--font-sans);
-        }
-
-        .trace-text {
-            color: #cbd5e1; /* Dotted / Light tracing feel */
-        }
-
-        /* MATCHING / IDENTIFY TYPE */
-        .list-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            direction: rtl;
-        }
-
-        .list-item {
+        .ws-item {
+            border: 1px dashed #ccc;
+            border-radius: 12px;
+            padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 20px;
-            border: 1px dashed #64748b;
-            border-radius: 8px;
-            font-family: var(--font-arabic);
-            font-size: 2rem;
+            direction: rtl;
         }
 
-        .answer-box {
+        .ws-arabic-prompt {
+            font-family: 'Traditional Arabic', 'Amiri', serif;
+            font-size: 3rem;
+            font-weight: bold;
+        }
+
+        .ws-answer-box {
             width: 120px;
-            height: 45px;
-            border: 1.5px solid #000;
-            border-radius: 6px;
+            height: 50px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background: #fafafa;
         }
 
-        /* FOOTER */
-        .ws-footer {
-            margin-top: 30px;
-            border-top: 1px solid #cbd5e1;
-            padding-top: 10px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: #64748b;
-        }
-
-        /* PRINT MEDIA STYLES */
+        /* PRINT STYLES - STRIPS AWAY ALL UI CONTROL ELEMENTS */
         @media print {
-            body { background: white; color: black; }
-            .sidebar, .preview-area {
-                margin: 0;
-                padding: 0;
-                background: white;
+            body {
+                background: #fff !important;
+                padding: 0 !important;
             }
-            .sidebar { display: none !important; }
-            .sheet {
-                box-shadow: none;
-                width: 100%;
-                min-height: 100vh;
-                padding: 0;
+
+            .page-header, .control-panel {
+                display: none !important;
             }
+
+            .worksheet-paper {
+                box-shadow: none !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                padding: 0 !important;
+                border-radius: 0 !important;
+            }
+
             @page {
                 size: A4;
-                margin: 15mm;
+                margin: 20mm;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- SIDEBAR CONTROLS -->
-    <div class="sidebar">
-        <a href="index.html" class="btn-nav">⬅ Return to Menu</a>
-        <h2>Worksheet Generator</h2>
+    <div class="page-header">
+        <a href="index.html" class="back-btn">⬅ Menu</a>
+        <button class="print-btn" onclick="window.print()">🖨️ Print Worksheet</button>
+    </div>
 
+    <!-- WORKSHEET CONTROLS -->
+    <div class="control-panel">
         <div class="control-group">
-            <label>Worksheet Type</label>
-            <select id="ws-type" onchange="renderWorksheet()">
-                <option value="trace">Tracing / Handwriting Practice</option>
-                <option value="identify">Rule Identification (Sukoon/Shaddah)</option>
-                <option value="sunmoon">Sun & Moon Letters Sort</option>
-                <option value="fill">Fill in Missing Letter</option>
+            <label for="topic-select">Worksheet Topic:</label>
+            <select id="topic-select" onchange="generateWorksheet()">
+                <option value="harakat">Short Vowels (Harakat)</option>
+                <option value="tanween">Tanween Identification</option>
+                <option value="madd">Madd Long Vowels</option>
+                <option value="sukoon">Sukoon Identification</option>
             </select>
         </div>
 
         <div class="control-group">
-            <label>Title (English)</label>
-            <input type="text" id="ws-title-input" value="Arabic Reading Worksheet" oninput="renderWorksheet()">
+            <label for="item-count">Number of Questions:</label>
+            <select id="item-count" onchange="generateWorksheet()">
+                <option value="6">6 Questions</option>
+                <option value="8" selected>8 Questions</option>
+                <option value="10">10 Questions</option>
+            </select>
         </div>
-
-        <div class="control-group">
-            <label>Instructions (Arabic)</label>
-            <input type="text" id="ws-inst-input" value="اقْرَأْ وَاكْتُبْ بِخَطٍّ جَمِيلٍ" oninput="renderWorksheet()">
-        </div>
-
-        <div class="control-group">
-            <label>Word Bank / Items (One per line)</label>
-            <textarea id="ws-words-input" oninput="renderWorksheet()">الْقَمَرُ
-الشَّمْسُ
-كَتَبَ
-مَنْ
-رَبَّك
-الْكِتَابُ</textarea>
-        </div>
-
-        <button class="btn btn-print" onclick="window.print()">
-            🖨️ Print Worksheet
-        </button>
     </div>
 
-    <!-- PRINT PREVIEW SHEET -->
-    <div class="preview-area">
-        <div class="sheet" id="print-sheet">
-            <div>
-                <div class="ws-header">
-                    <div class="ws-meta">
-                        <span>Name: ______________________</span>
-                        <span>Date: ____________</span>
-                        <span>Score: _____/10</span>
-                    </div>
-                    <h1 class="ws-title" id="ws-title-display">Arabic Reading Worksheet</h1>
-                    <div class="ws-instructions" id="ws-inst-display">اقْرَأْ وَاكْتُبْ بِخَطٍّ جَمِيلٍ</div>
-                </div>
-
-                <div class="ws-body" id="ws-body-display">
-                    <!-- Dynamic Worksheet Content Rendered Here -->
-                </div>
+    <!-- PRINTABLE PAPER AREA -->
+    <div class="worksheet-paper">
+        <div class="ws-header">
+            <div class="ws-title-block">
+                <h2 id="ws-heading">Arabic Phonics Practice</h2>
+                <p id="ws-subheading">Zara’s Arabic Literacy — Practice Worksheet</p>
             </div>
-
-            <div class="ws-footer">
-                <span>Classroom Resource - Arabic Literacy</span>
-                <span>Page 1 of 1</span>
+            <div class="ws-meta-fields">
+                <div>Name: <span class="ws-meta-line"></span></div>
+                <div>Date: <span class="ws-meta-line"></span></div>
+                <div>Score: <span class="ws-meta-line"></span></div>
             </div>
+        </div>
+
+        <div class="ws-grid" id="worksheet-grid">
+            <!-- Dynamic exercise items -->
         </div>
     </div>
 
     <script>
-        function renderWorksheet() {
-            // Update Title & Instructions
-            const title = document.getElementById('ws-title-input').value;
-            const inst = document.getElementById('ws-inst-input').value;
-            const rawWords = document.getElementById('ws-words-input').value;
-            const words = rawWords.split('\n').filter(w => w.trim() !== '');
+        const dataset = {
+            harakat: [
+                { symbol: "بَ", label: "Write the Vowel Name" },
+                { symbol: "تِ", label: "Write the Vowel Name" },
+                { symbol: "ثُ", label: "Write the Vowel Name" },
+                { symbol: "جَ", label: "Write the Vowel Name" },
+                { symbol: "حِ", label: "Write the Vowel Name" },
+                { symbol: "خُ", label: "Write the Vowel Name" },
+                { symbol: "دَ", label: "Write the Vowel Name" },
+                { symbol: "ذِ", label: "Write the Vowel Name" },
+                { symbol: "رُ", label: "Write the Vowel Name" },
+                { symbol: "زَ", label: "Write the Vowel Name" }
+            ],
+            tanween: [
+                { symbol: "بً", label: "Identify Tanween Type" },
+                { symbol: "تٍ", label: "Identify Tanween Type" },
+                { symbol: "ثٌ", label: "Identify Tanween Type" },
+                { symbol: "جً", label: "Identify Tanween Type" },
+                { symbol: "حٍ", label: "Identify Tanween Type" },
+                { symbol: "خٌ", label: "Identify Tanween Type" },
+                { symbol: "دً", label: "Identify Tanween Type" },
+                { symbol: "ذٍ", label: "Identify Tanween Type" }
+            ],
+            madd: [
+                { symbol: "با", label: "Identify Madd Letter" },
+                { symbol: "بو", label: "Identify Madd Letter" },
+                { symbol: "بي", label: "Identify Madd Letter" },
+                { symbol: "تا", label: "Identify Madd Letter" },
+                { symbol: "تو", label: "Identify Madd Letter" },
+                { symbol: "تي", label: "Identify Madd Letter" },
+                { symbol: "جا", label: "Identify Madd Letter" },
+                { symbol: "جو", label: "Identify Madd Letter" }
+            ],
+            sukoon: [
+                { symbol: "مَنْ", label: "Circle the Sukoon Letter" },
+                { symbol: "قُمْ", label: "Circle the Sukoon Letter" },
+                { symbol: "هَلْ", label: "Circle the Sukoon Letter" },
+                { symbol: "عَنْ", label: "Circle the Sukoon Letter" },
+                { symbol: "كَمْ", label: "Circle the Sukoon Letter" },
+                { symbol: "لَمْ", label: "Circle the Sukoon Letter" }
+            ]
+        };
 
-            document.getElementById('ws-title-display').innerText = title;
-            document.getElementById('ws-inst-display').innerText = inst;
-
-            const type = document.getElementById('ws-type').value;
-            const body = document.getElementById('ws-body-display');
-            body.innerHTML = '';
-
-            if (type === 'trace') {
-                renderTracingGrid(body, words);
-            } else if (type === 'identify') {
-                renderIdentificationList(body, words);
-            } else if (type === 'sunmoon') {
-                renderSunMoonSort(body, words);
-            } else if (type === 'fill') {
-                renderFillInBlanks(body, words);
-            }
-        }
-
-        function renderTracingGrid(container, words) {
-            let html = `<table class="grid-table">
-                <thead>
-                    <tr>
-                        <th style="width: 25%">Model (النموذج)</th>
-                        <th style="width: 37%">Trace (تتبع)</th>
-                        <th style="width: 38%">Write (اكتب)</th>
-                    </tr>
-                </thead>
-                <tbody>`;
+        function generateWorksheet() {
+            const topic = document.getElementById('topic-select').value;
+            const count = parseInt(document.getElementById('item-count').value, 10);
             
-            words.forEach(word => {
-                html += `<tr>
-                    <td><b>${word}</b></td>
-                    <td class="trace-text">${word}</td>
-                    <td></td>
-                </tr>`;
-            });
+            const grid = document.getElementById('worksheet-grid');
+            grid.innerHTML = '';
 
-            html += `</tbody></table>`;
-            container.innerHTML = html;
+            const items = dataset[topic].slice(0, count);
+
+            items.forEach((item, idx) => {
+                const card = document.createElement('div');
+                card.className = 'ws-item';
+                card.innerHTML = `
+                    <div class="ws-arabic-prompt">${item.symbol}</div>
+                    <div class="ws-answer-box"></div>
+                `;
+                grid.appendChild(card);
+            });
         }
 
-        function renderIdentificationList(container, words) {
-            let html = `<div class="list-container">`;
-            words.forEach((word, index) => {
-                html += `<div class="list-item">
-                    <span>${index + 1}. ${word}</span>
-                    <div style="display: flex; gap: 15px; font-size: 1rem; font-family: var(--font-sans);">
-                        <label><input type="checkbox"> Sukoon (سكون)</label>
-                        <label><input type="checkbox"> Shaddah (شدة)</label>
-                    </div>
-                </div>`;
-            });
-            html += `</div>`;
-            container.innerHTML = html;
-        }
-
-        function renderSunMoonSort(container, words) {
-            let html = `<div class="list-container" style="margin-bottom: 20px;">`;
-            words.forEach((word, index) => {
-                html += `<div class="list-item">
-                    <span>${index + 1}. ${word}</span>
-                    <div style="display: flex; gap: 15px; font-size: 1rem; font-family: var(--font-sans);">
-                        <label><input type="checkbox"> Qamariyyah (قمرية)</label>
-                        <label><input type="checkbox"> Shamsiyyah (شمسية)</label>
-                    </div>
-                </div>`;
-            });
-            html += `</div>`;
-            container.innerHTML = html;
-        }
-
-        function renderFillInBlanks(container, words) {
-            let html = `<div class="list-container">`;
-            words.forEach((word, index) => {
-                // Obfuscate middle or last char for fill-in practice
-                let blankWord = word.length > 2 ? word.substring(0, word.length - 1) + '___' : word + '___';
-                html += `<div class="list-item">
-                    <span>${index + 1}. ${blankWord}</span>
-                    <div class="answer-box"></div>
-                </div>`;
-            });
-            html += `</div>`;
-            container.innerHTML = html;
-        }
-
-        // Initial Render
-        window.onload = renderWorksheet;
+        window.onload = generateWorksheet;
     </script>
 </body>
 </html>
