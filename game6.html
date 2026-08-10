@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shaddah Rules - Zara’s Arabic Literacy</title>
+    <title>Madd Rules - Zara’s Arabic Literacy</title>
     <style>
         :root {
             --bg-dark: #0d1b2a;
@@ -52,6 +52,27 @@
             color: var(--accent-gold);
         }
 
+        /* MUTE BUTTON STYLES */
+        .mute-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .mute-btn:hover { background: rgba(255, 255, 255, 0.2); }
+
+        .mute-btn.muted {
+            background: rgba(239, 71, 111, 0.2);
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
         /* MAIN GAME ARENA */
         .arena {
             background: var(--card-bg);
@@ -62,21 +83,31 @@
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             border: 3px solid rgba(255,255,255,0.05);
+            position: relative;
         }
 
         .instruction {
             font-size: 1.1rem;
             color: #cbd5e1;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
-        .question-word {
-            font-size: 4rem;
-            font-weight: bold;
-            color: var(--accent-gold);
-            margin-bottom: 30px;
-            font-family: 'Traditional Arabic', 'Amiri', serif;
+        /* SPEAKER BUTTON */
+        .audio-btn {
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            font-size: 2.5rem;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 183, 3, 0.4);
+            transition: transform 0.2s;
+            margin-bottom: 35px;
         }
+
+        .audio-btn:active { transform: scale(0.95); }
 
         /* ARABIC OPTIONS GRID */
         .options-grid {
@@ -95,11 +126,21 @@
             user-select: none;
             transition: all 0.2s;
             font-family: 'Traditional Arabic', 'Amiri', serif;
+            position: relative;
         }
 
         .arabic-card:hover {
             border-color: var(--accent-gold);
             background: rgba(255, 183, 3, 0.1);
+        }
+
+        .arabic-card .key-badge {
+            position: absolute;
+            top: 8px;
+            left: 12px;
+            font-size: 0.8rem;
+            color: #64748b;
+            font-family: sans-serif;
         }
 
         /* FEEDBACK STATES */
@@ -113,38 +154,87 @@
             background: var(--accent-red) !important;
             border-color: var(--accent-red) !important;
         }
+
+        /* VICTORY MODAL */
+        .modal-overlay {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(13, 27, 42, 0.95);
+            border-radius: 24px;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 10;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-title {
+            font-size: 2rem;
+            color: var(--accent-gold);
+            margin-bottom: 10px;
+        }
+
+        .modal-btn {
+            background: var(--accent-green);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
 
     <div class="game-header">
         <a href="index.html" class="back-btn">⬅ Menu</a>
-        <div class="score-board">⭐ Score: <span id="score">0</span></div>
+
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <button class="mute-btn" id="mute-btn" onclick="toggleMute()">🔊 Sound On</button>
+            <div class="score-board">⭐ Score: <span id="score">0</span></div>
+        </div>
     </div>
 
     <div class="arena">
-        <div class="instruction">Identify the letter carrying a Shaddah (ّ):</div>
-        <div class="question-word" id="word-display">...</div>
+        <div class="instruction">Tap the speaker to listen, then select the matching long vowel (Madd)!</div>
+        
+        <button class="audio-btn" onclick="playQuestionSound()">🔊</button>
 
         <div class="options-grid" id="options-container">
             <!-- Dynamic option cards -->
         </div>
+
+        <!-- Completion Modal -->
+        <div class="modal-overlay" id="victory-modal">
+            <div class="modal-title">🎉 Excellent Work!</div>
+            <p style="font-size: 1.2rem; margin-bottom: 10px;">You mastered all Madd rules in this set!</p>
+            <p style="color: var(--accent-gold); font-size: 1.4rem;">Final Score: <span id="final-score">0</span></p>
+            <button class="modal-btn" onclick="restartGame()">Play Again 🔄</button>
+        </div>
     </div>
+
+    <script src="sound.js"></script>
 
     <script>
         const questions = [
-            { word: "رَبَّ", correct: "بَّ", options: ["بَّ", "رَ", "تَّ", "بَ"] },
-            { word: "ثُمَّ", correct: "مَّ", options: ["ثُ", "مَّ", "مُ", "نَّ"] },
-            { word: "عَلَّمَ", correct: "لَّ", options: ["عَ", "لَّ", "مَ", "لَ"] },
-            { word: "إِنَّ", correct: "نَّ", options: ["إِ", "نَّ", "نَ", "مَّ"] }
+            { sound: "با", correct: "با", options: ["با", "بو", "بي", "بَ"] },
+            { sound: "بو", correct: "بو", options: ["با", "بو", "بي", "بُ"] },
+            { sound: "تي", correct: "تي", options: ["تا", "تو", "تي", "تِ"] },
+            { sound: "جا", correct: "جا", options: ["جا", "جو", "جي", "جَ"] }
         ];
 
         let currentIndex = 0;
         let score = 0;
+        let isMuted = false;
+        let canAnswer = true;
+        let activeOptions = [];
 
-        /* ----------------------------------------------------
-           SAVE SCORE FUNCTION (Saves Game 6 high score)
-        ---------------------------------------------------- */
         function saveGameScore(gameNumber, newStars) {
             const key = `arabic_game_${gameNumber}_score`;
             const previousHighScore = parseInt(localStorage.getItem(key) || '0', 10);
@@ -154,40 +244,94 @@
             }
         }
 
-        function loadQuestion() {
-            const q = questions[currentIndex];
-            document.getElementById('word-display').innerText = q.word;
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
 
+        function toggleMute() {
+            isMuted = !isMuted;
+            const btn = document.getElementById('mute-btn');
+            if (isMuted) {
+                btn.innerText = "🔇 Sound Off";
+                btn.classList.add('muted');
+                window.speechSynthesis.cancel();
+            } else {
+                btn.innerText = "🔊 Sound On";
+                btn.classList.remove('muted');
+            }
+        }
+
+        function loadQuestion() {
+            canAnswer = true;
+            const q = questions[currentIndex];
             const container = document.getElementById('options-container');
             container.innerHTML = '';
 
-            q.options.forEach(symbol => {
+            playQuestionSound();
+
+            activeOptions = shuffleArray(q.options);
+
+            activeOptions.forEach((symbol, index) => {
                 const card = document.createElement('div');
                 card.className = 'arabic-card';
-                card.innerText = symbol;
+                card.innerHTML = `<span class="key-badge">${index + 1}</span>${symbol}`;
                 card.onclick = () => checkAnswer(symbol, card);
                 container.appendChild(card);
             });
         }
 
+        function playQuestionSound() {
+            if (isMuted) return;
+            
+            window.speechSynthesis.cancel();
+            const q = questions[currentIndex];
+            const utterance = new SpeechSynthesisUtterance(q.sound);
+            utterance.lang = 'ar-SA';
+            utterance.rate = 0.8;
+            
+            // Handle browser user-gesture requirements safely
+            try {
+                window.speechSynthesis.speak(utterance);
+            } catch (e) {
+                console.warn("Speech synthesis requires direct interaction:", e);
+            }
+        }
+
         function checkAnswer(selected, cardElement) {
+            if (!canAnswer) return;
+
             const q = questions[currentIndex];
 
             if (selected === q.correct) {
+                canAnswer = false;
+                if (!isMuted && typeof playCorrectSound === 'function') {
+                    playCorrectSound();
+                }
+
                 cardElement.classList.add('correct');
                 score += 10;
                 document.getElementById('score').innerText = score;
 
-                /* ----------------------------------------------------
-                   CALL SAVE SCORE HERE (Pass 6 for Game 6)
-                ---------------------------------------------------- */
-                saveGameScore(6, score);
+                saveGameScore(4, score);
 
                 setTimeout(() => {
-                    currentIndex = (currentIndex + 1) % questions.length;
-                    loadQuestion();
+                    currentIndex++;
+                    if (currentIndex < questions.length) {
+                        loadQuestion();
+                    } else {
+                        showVictoryScreen();
+                    }
                 }, 1000);
             } else {
+                if (!isMuted && typeof playWrongSound === 'function') {
+                    playWrongSound();
+                }
+
                 cardElement.classList.add('wrong');
                 setTimeout(() => {
                     cardElement.classList.remove('wrong');
@@ -195,7 +339,39 @@
             }
         }
 
-        window.onload = loadQuestion;
+        function showVictoryScreen() {
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('victory-modal').classList.add('active');
+        }
+
+        function restartGame() {
+            document.getElementById('victory-modal').classList.remove('active');
+            currentIndex = 0;
+            score = 0;
+            document.getElementById('score').innerText = score;
+            loadQuestion();
+        }
+
+        // Keyboard Shortcut Listener (1-4 keys & Space)
+        document.addEventListener('keydown', (e) => {
+            if (['1', '2', '3', '4'].includes(e.key) && canAnswer) {
+                const idx = parseInt(e.key, 10) - 1;
+                const container = document.getElementById('options-container');
+                const cards = container.getElementsByClassName('arabic-card');
+                if (cards[idx] && activeOptions[idx]) {
+                    checkAnswer(activeOptions[idx], cards[idx]);
+                }
+            } else if (e.code === 'Space') {
+                e.preventDefault();
+                playQuestionSound();
+            }
+        });
+
+        window.onload = () => {
+            score = parseInt(localStorage.getItem('arabic_game_4_score') || '0', 10);
+            document.getElementById('score').innerText = score;
+            loadQuestion();
+        };
     </script>
 </body>
 </html>
