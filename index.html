@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zara’s Arabic Literacy | Learn Arabic Reading, Writing & Tajweed</title>
+    <title>Zara’s Arabic Literacy - Main Menu</title>
     <style>
         :root {
-            --bg-color: #0d1b2a;
+            --bg-dark: #0d1b2a;
             --card-bg: #1b263b;
             --accent-gold: #ffb703;
             --accent-green: #06d6a0;
@@ -18,224 +18,266 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
+            background-color: var(--bg-dark);
             color: var(--white);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-bottom: 40px;
+            padding: 20px;
         }
 
-        /* TOP BAR: BRAND & STARS */
-        .top-nav {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .logo-title {
-            font-size: 1.3rem;
-            font-weight: 900;
-            color: var(--accent-gold);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .star-badge {
-            background: var(--accent-gold);
-            color: #000;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* HERO HEADER */
-        .header-section {
+        /* HEADER SECTION */
+        header {
             text-align: center;
-            margin: 40px 20px 20px;
-            max-width: 800px;
+            margin-top: 20px;
+            margin-bottom: 25px;
         }
 
-        .header-section h1 {
-            font-size: 2.5rem;
-            margin-bottom: 12px;
-            line-height: 1.2;
+        h1 {
+            font-size: 2.2rem;
+            color: var(--accent-gold);
+            margin-bottom: 8px;
         }
 
-        .header-section p {
-            color: #a3b18a;
-            font-size: 1.2rem;
-            line-height: 1.5;
+        p.subtitle {
+            color: #cbd5e1;
+            font-size: 1rem;
         }
 
-        /* GAME GRID */
-        .game-grid {
+        /* TOTAL SCORE BADGE */
+        .total-score-card {
+            background: rgba(255, 183, 3, 0.15);
+            border: 2px solid var(--accent-gold);
+            border-radius: 20px;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+            margin-bottom: 35px;
+            box-shadow: 0 0 20px rgba(255, 183, 3, 0.2);
+        }
+
+        /* GAMES GRID */
+        .games-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            width: 90%;
-            max-width: 1100px;
-            margin: 30px auto;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 900px;
         }
 
         .game-card {
             background: var(--card-bg);
             border-radius: 20px;
-            padding: 25px;
-            text-align: center;
-            border: 3px solid transparent;
-            transition: transform 0.3s, border-color 0.3s;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
+            padding: 25px 20px;
+            text-decoration: none;
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
         }
 
         .game-card:hover {
-            transform: translateY(-8px);
+            transform: translateY(-5px);
             border-color: var(--accent-gold);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
         }
 
-        .game-icon {
-            font-size: 3.5rem;
-            margin-bottom: 15px;
+        .game-number {
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-gold);
+            margin-bottom: 8px;
         }
 
-        .game-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-            color: var(--white);
+        .game-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 8px;
         }
 
-        .game-card p {
-            font-size: 0.95rem;
-            color: #cbd5e1;
-            line-height: 1.4;
+        .game-desc {
+            font-size: 0.9rem;
+            color: #94a3b8;
             margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .game-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1fr solid rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+            font-size: 0.95rem;
+            color: var(--accent-gold);
         }
 
         .play-btn {
-            background: var(--accent-green);
+            background: var(--accent-gold);
             color: #000;
-            border: none;
-            padding: 12px 25px;
-            font-weight: 900;
-            font-size: 1rem;
-            border-radius: 12px;
-            cursor: pointer;
-            text-transform: uppercase;
-            width: 100%;
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-size: 0.85rem;
         }
-
-        .game-card.pink .play-btn { background: var(--accent-pink); color: #fff; }
-        .game-card.gold .play-btn { background: var(--accent-gold); color: #000; }
     </style>
 </head>
 <body>
 
-    <!-- TOP NAV -->
-    <div class="top-nav">
-        <div class="logo-title">ZARA’S ARABIC LITERACY</div>
-        <div class="star-badge">⭐ <span id="star-count">0</span> Stars</div>
+    <header>
+        <h1>Zara’s Arabic Literacy</h1>
+        <p class="subtitle">Interactive Tajweed &amp; Phonics Learning Hub</p>
+    </header>
+
+    <!-- AGGREGATED TOTAL SCORE -->
+    <div class="total-score-card">
+        <span>⭐ Total Stars Earned:</span>
+        <span id="total-stars">0</span>
     </div>
 
-    <!-- MAIN HEADER -->
-    <div class="header-section">
-        <h1>Learn Arabic Reading, Writing & Tajweed 🎒</h1>
-        <p>Interactive Nurul Bayan Standard Games for Teachers & Students</p>
+    <!-- 8 GAME CARDS GRID -->
+    <div class="games-grid">
+
+        <!-- Game 1 -->
+        <a href="game1.html" class="game-card">
+            <div>
+                <div class="game-number">Level 1</div>
+                <div class="game-title">Harakat Match</div>
+                <div class="game-desc">Master short vowels (Fatha, Kasra, Damma) through audio identification.</div>
+            </div>
+            <div class="game-card-footer">
+                <span>Best: <span id="score-g1">0</span> pts</span>
+                <span class="play-btn">Play ➔</span>
+            </div>
+        </a>
+
+        <!-- Game 2 -->
+        <a href="game2.html" class="game-card">
+            <div>
+                <div class="game-number">Level 2</div>
+                <div class="game-title">Letter Joining</div>
+                <div class="game-desc">Identify initial, medial, and final connected letter forms.</div>
+            </div>
+            <div class="game-card-footer">
+                <span>Best: <span id="score-g2">0</span> pts</span>
+                <span class="play-btn">Play ➔</span>
+            </div>
+        </a>
+
+        <!-- Game 3 -->
+        <a href="game3.html" class="game-card">
+            <div>
+                <div class="game-number">Level 3</div>
+                <div class="game-title">Tanween Match</div>
+                <div class="game-desc">Recognize double vowels (Fathatain, Kasratain, Dammatain).</div>
+            </div>
+            <div class="game-card-footer">
+                <span>Best: <span id="score-g3">0</span> pts</span>
+                <span class="play-btn">Play ➔</span>
+            </div>
+        </a>
+
+        <!-- Game 4 -->
+        <a href="game4.html" class="game-card">
+            <div>
+                <div class="game-number">Level 4</div>
+                <div class="game-title">Madd Rules</div>
+                <div class="game-desc">Practice long vowels with Madd Alif, Waw, and Ya.</div>
+            </div>
+            <div class="game-card-footer">
+                <span>Best: <span id="score-g4">0</span> pts</span>
+                <span class="play-btn">Play ➔</span>
+            </div>
+        </a>
+
+        <!-- Game 5 -->
+        <a href="game5.html" class="game-card">
+            <div>
+                <div class="game-number">Level 5</div>
+                <div class="game-title">Sukoon Rules</div>
+                <div class="game-desc">Locate rested consonants carrying Sukoon in words.</div>
+            </div>
+            <div class="game-card-footer">
+                <span>Best: <span id="score-g5">0</span> pts</span>
+                <span class="play-btn">Play ➔</span>
+            </div>
+        </a>
+
+        <!-- Game 6 -->
+        <a href="game6.html" class="game-card">
+            <div>
+                <div class="game-number">Level 6</div>
+                <div class="game-title">Shaddah Rules</div>
+                <div class="game-desc">Spot doubled letter emphasis across Quranic vocabulary.</div>
+            </div>
+            <div class="game-card-footer">
+                <span>Best: <span id="score-g6">0</span> pts</span>
+                <span class="play-btn">Play ➔</span>
+            </div>
+        </a>
+
+        <!-- Game 7 -->
+        <a href="game7.html" class="game-card">
+            <div>
+                <div class="game-number">Level 7</div>
+                <div class="game-title">Hamzatul Wasl</div>
+                <div class="game-desc">Distinguish between connecting and severing Hamza forms.</div>
+            </div>
+            <div class="game-card-footer">
+                <span>Best: <span id="score-g7">0</span> pts</span>
+                <span class="play-btn">Play ➔</span>
+            </div>
+        </a>
+
+        <!-- Game 8 -->
+        <a href="game8.html" class="game-card">
+            <div>
+                <div class="game-number">Level 8</div>
+                <div class="game-title">Sun &amp; Moon Letters</div>
+                <div class="game-desc">Classify words into Al-Shamsiyyah and Al-Qamariyyah rules.</div>
+            </div>
+            <div class="game-card-footer">
+                <span>Best: <span id="score-g8">0</span> pts</span>
+                <span class="play-btn">Play ➔</span>
+            </div>
+        </a>
+
     </div>
 
-    <!-- GAME SELECTION GRID -->
-    <div class="game-grid">
-        
-        <!-- GAME 1 -->
-        <div class="game-card gold" onclick="window.location.href='game1.html'">
-            <div class="game-icon">🔊</div>
-            <h3>1. Short Vowels</h3>
-            <p>Fatha, Kasra, Damma identification.</p>
-            <button class="play-btn">Play</button>
-        </div>
-
-        <!-- GAME 2 -->
-        <div class="game-card" onclick="window.location.href='game2.html'">
-            <div class="game-icon">✍️</div>
-            <h3>2. Letter Joining</h3>
-            <p>Initial, medial, and final letter forms.</p>
-            <button class="play-btn">Play</button>
-        </div>
-
-        <!-- GAME 3 -->
-        <div class="game-card pink" onclick="window.location.href='game3.html'">
-            <div class="game-icon">🎈</div>
-            <h3>3. Tanween</h3>
-            <p>Fathatain, Kasratain, Dammatain practice.</p>
-            <button class="play-btn">Play</button>
-        </div>
-
-        <!-- GAME 4 -->
-        <div class="game-card gold" onclick="window.location.href='game4.html'">
-            <div class="game-icon">📖</div>
-            <h3>4. Madd Rules</h3>
-            <p>Long vowels (Madd Alif, Ya, Waw).</p>
-            <button class="play-btn">Play</button>
-        </div>
-
-        <!-- GAME 5 -->
-        <div class="game-card" onclick="window.location.href='game5.html'">
-            <div class="game-icon">⏸️</div>
-            <h3>5. Sukoon Rules</h3>
-            <p>Identify non-voweled (sakin) letters.</p>
-            <button class="play-btn">Play</button>
-        </div>
-
-        <!-- GAME 6 -->
-        <div class="game-card pink" onclick="window.location.href='game6.html'">
-            <div class="game-icon">⚡</div>
-            <h3>6. Shaddah Rules</h3>
-            <p>Identify doubled (mushaddad) letters.</p>
-            <button class="play-btn">Play</button>
-        </div>
-
-        <!-- GAME 7 -->
-        <div class="game-card gold" onclick="window.location.href='game7.html'">
-            <div class="game-icon">🌙</div>
-            <h3>7. Sun & Moon Letters</h3>
-            <p>Al-Qamariyyah vs. Al-Shamsiyyah.</p>
-            <button class="play-btn">Play</button>
-        </div>
-
-        <!-- TEACHER WORKSHEET GENERATOR CARD -->
-        <div class="game-card gold" onclick="window.location.href='generator.html'" style="grid-column: 1 / -1;">
-            <div class="game-icon">🖨️</div>
-            <h3>Printable Worksheet Generator</h3>
-            <p>Create and print custom tracing sheets, Sukoon/Shaddah quizzes, and Sun/Moon letter exercises.</p>
-            <button class="play-btn">Open Generator</button>
-        </div>
-
-    </div>
-
-    <!-- STAR COUNTER SCRIPT -->
     <script>
-        function loadTotalStars() {
-            let totalStars = 0;
-            // Iterate over all 7 games stored in localStorage
-            for (let i = 1; i <= 7; i++) {
+        /* ----------------------------------------------------
+           CALCULATE & DISPLAY SCORES FROM ALL 8 GAMES
+        ---------------------------------------------------- */
+        function loadTotalScores() {
+            let grandTotal = 0;
+            const totalGames = 8;
+
+            for (let i = 1; i <= totalGames; i++) {
                 const gameScore = parseInt(localStorage.getItem(`arabic_game_${i}_score`) || '0', 10);
-                totalStars += gameScore;
+                
+                // Update individual game card score badge
+                const scoreElement = document.getElementById(`score-g${i}`);
+                if (scoreElement) {
+                    scoreElement.innerText = gameScore;
+                }
+
+                grandTotal += gameScore;
             }
-            document.getElementById('star-count').innerText = totalStars;
+
+            // Update main overall star display
+            document.getElementById('total-stars').innerText = grandTotal;
         }
 
-        window.onload = loadTotalStars;
+        window.onload = loadTotalScores;
     </script>
-
 </body>
 </html>
