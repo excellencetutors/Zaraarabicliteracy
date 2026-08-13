@@ -6,8 +6,9 @@
     <title>Zara’s Arabic Literacy - Main Menu</title>
     <style>
         :root {
-            --bg-dark: #0d1b2a;
-            --card-bg: #1b263b;
+            --bg-dark: #0a111e;
+            --bg-gradient: radial-gradient(circle at 50% 20%, #172a45 0%, #0a111e 80%);
+            --card-bg: rgba(27, 38, 59, 0.75);
             --accent-gold: #ffb703;
             --accent-green: #06d6a0;
             --accent-red: #ef476f;
@@ -19,6 +20,11 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-dark);
+            background-image: 
+                /* Subtle Islamic geometric star/grid overlay using SVG background */
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l5 15 15 5-15 5-5 15-5-15-15-5 15-5z' fill='%23ffffff' fill-opacity='0.02'/%3E%3C/svg%3E"),
+                var(--bg-gradient);
+            background-attachment: fixed;
             color: var(--white);
             min-height: 100vh;
             display: flex;
@@ -35,14 +41,17 @@
         }
 
         h1 {
-            font-size: 2.2rem;
+            font-size: 2.3rem;
             color: var(--accent-gold);
             margin-bottom: 8px;
+            text-shadow: 0 0 20px rgba(255, 183, 3, 0.3);
+            letter-spacing: 0.5px;
         }
 
         p.subtitle {
             color: #cbd5e1;
-            font-size: 1rem;
+            font-size: 1.05rem;
+            font-weight: 300;
         }
 
         /* SCORE & RESET BAR */
@@ -56,8 +65,9 @@
         }
 
         .total-score-card {
-            background: rgba(255, 183, 3, 0.15);
+            background: rgba(255, 183, 3, 0.12);
             border: 2px solid var(--accent-gold);
+            backdrop-filter: blur(8px);
             border-radius: 20px;
             padding: 12px 25px;
             display: flex;
@@ -66,12 +76,13 @@
             font-size: 1.3rem;
             font-weight: bold;
             color: var(--accent-gold);
-            box-shadow: 0 0 20px rgba(255, 183, 3, 0.15);
+            box-shadow: 0 0 25px rgba(255, 183, 3, 0.15);
         }
 
         .reset-btn {
-            background: rgba(239, 71, 111, 0.15);
+            background: rgba(239, 71, 111, 0.12);
             border: 2px solid var(--accent-red);
+            backdrop-filter: blur(8px);
             color: var(--accent-red);
             padding: 12px 20px;
             border-radius: 20px;
@@ -98,6 +109,7 @@
 
         .game-card {
             background: var(--card-bg);
+            backdrop-filter: blur(12px);
             border-radius: 20px;
             padding: 25px 20px;
             text-decoration: none;
@@ -105,14 +117,15 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            border: 2px solid rgba(255, 255, 255, 0.05);
-            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
         }
 
         .game-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-6px);
             border-color: var(--accent-gold);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            box-shadow: 0 12px 30px rgba(255, 183, 3, 0.2);
         }
 
         .game-number {
@@ -154,6 +167,11 @@
             padding: 6px 14px;
             border-radius: 10px;
             font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+
+        .game-card:hover .play-btn {
+            background: #ffffff;
         }
     </style>
 </head>
@@ -285,9 +303,6 @@
     <script>
         const totalGames = 8;
 
-        /* ----------------------------------------------------
-           LOAD SCORES & AGGREGATE TOTAL
-        ---------------------------------------------------- */
         function loadTotalScores() {
             let grandTotal = 0;
 
@@ -305,9 +320,6 @@
             document.getElementById('total-stars').innerText = grandTotal;
         }
 
-        /* ----------------------------------------------------
-           RESET ALL HIGH SCORES
-        ---------------------------------------------------- */
         function confirmResetProgress() {
             const userConfirmed = confirm("Are you sure you want to reset all high scores to zero?");
             if (userConfirmed) {
